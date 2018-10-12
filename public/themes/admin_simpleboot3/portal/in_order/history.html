@@ -1,0 +1,80 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="javascript:;">结算历史</a></li>
+    </ul>
+	<form class="well form-inline margin-top-20" method="post" action="{:url('InOrder/history')}">
+		回收员:
+        <select class="form-control" name="collecter_id" style="width: 140px;">
+            <volist name="collecter" id="c">
+			<option value="{$c.id}" <eq name="collecter_id" value="$c['id']">selected="selected"</eq>>{$c.user_nickname}</option>
+			</volist>
+        </select> &nbsp;&nbsp;
+        日期:
+        <input type="text" class="form-control js-bootstrap-date" name="start_time"
+               value="{$start_time|default=''}"
+               style="width: 140px;" autocomplete="off"> -
+        <input type="text" class="form-control js-bootstrap-date" name="end_time"
+               value="{$end_time|default=''}"
+               style="width: 140px;" autocomplete="off"> &nbsp; &nbsp;
+        
+        <input type="submit" class="btn btn-primary" value="确定"/>
+    </form>
+    <form class="js-ajax-form" action="" method="post">
+		<input type="hidden" name="user_id" value="{$collecter_id}" />
+		<input type="hidden" name="start_time" value="{$start_time}" />
+		<input type="hidden" name="end_time" value="{$end_time}" />
+        <table class="table table-list">
+            <thead>
+            <tr>
+                <th></th>
+				<th>资源种类</th>
+				<th>结算单价</th>
+				<th>重量（kg）/ 数量（个）</th>
+				<th>结算金额</th>
+				<th>合计</th>
+            </tr>
+            </thead>
+			<foreach name="data" item="v" key="k">
+				<foreach name="v['g1']" item="g1" key="gk">
+				<tr class="<if condition="$k%2 eq 0">warning</if>">
+					<eq name="gk" value="0">
+					<td rowspan="{:count($v['g1'])}" class="text-center">{:date('Y-m-d',$v['start_time'])}<br/>{:date('Y-m-d',$v['end_time'])}</td>
+					</eq>
+					<td>{$goods[$g1['goods_id']]['name']}</td>
+					<td>{$g1.price}</td>
+					<td>{$g1.num}</td>
+					<td>{$g1['price'] * $g1['num']}</td>
+					<eq name="gk" value="0">
+					<td rowspan="{:count($v['g1'])}">{$v.amount}</td>
+					</eq>
+				</tr>
+				</foreach>
+				<foreach name="v['g2']" item="g1" key="gk">
+				<tr class="<if condition="$k%2 eq 0">warning</if>">
+					<eq name="gk" value="0">
+					<td rowspan="{:count($v['g1'])}" class="text-center">实际结算</td>
+					</eq>
+					<td>{$goods[$g1['goods_id']]['name']}</td>
+					<td>{$g1.price}</td>
+					<td>{$g1.num}</td>
+					<td>{$g1['price'] * $g1['num']}</td>
+					<eq name="gk" value="0">
+					<td rowspan="{:count($v['g1'])}">{$v.actual_amount}</td>
+					</eq>
+				</tr>
+				</foreach>
+			</foreach>
+        </table>
+    </form>
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+<script>
+    function reloadPage(win) {
+        win.location.href = win.location.href;
+    }
+</script>
+</body>
+</html>

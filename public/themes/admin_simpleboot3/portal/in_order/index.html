@@ -1,0 +1,113 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="javascript:;">待结算列表</a></li>
+    </ul>
+	<form class="well form-inline margin-top-20" method="post" action="{:url('InOrder/index')}">
+		回收员:
+        <select class="form-control" name="collecter_id" style="width: 140px;">
+            <volist name="collecter" id="c">
+			<option value="{$c.id}" <eq name="collecter_id" value="$c['id']">selected="selected"</eq>>{$c.user_nickname}</option>
+			</volist>
+        </select> &nbsp;&nbsp;
+        <span id="J_span" style="display:none;">日期:
+        <input type="text" class="form-control" name="start_time"
+               value="{$start_time|default=''}"
+               style="width: 140px;" autocomplete="off" readonly> -
+        <input type="text" class="form-control js-bootstrap-date" name="end_time"
+               value="{$end_time|default=''}"
+               style="width: 140px;" autocomplete="off"> &nbsp; &nbsp;
+		</span>
+        
+        <input type="submit" class="btn btn-primary" value="确定"/>
+    </form>
+    <form class="js-ajax-form" action="" method="post" id="J_form" style="display:none;">
+		<input type="hidden" name="user_id" value="{$collecter_id}" />
+		<input type="hidden" name="start_time" value="{$start_time}" />
+		<input type="hidden" name="end_time" value="{$end_time}" />
+        <table class="table table-list">
+            <thead>
+            <tr>
+                <th></th>
+				<th>资源种类</th>
+				<th>结算单价</th>
+				<th>重量（kg）/ 数量（个）</th>
+				<th>结算金额</th>
+				<th>合计</th>
+            </tr>
+            </thead>
+			<foreach name="data" item="v" key="k">
+			<tr class="success">
+				<eq name="k" value="0">
+				<td rowspan="{:count($data)}" class="text-center">{$start_time|default=''}<br/>{$end_time|default=''}</td>
+				</eq>
+				<td>{$v.name}</td>
+				<td>{$v.price}</td>
+				<td>{$v.num}</td>
+				<td>{$v['price'] * $v['num']}</td>
+				<eq name="k" value="0">
+				<td rowspan="{:count($data)}">{$total}</td>
+				</eq>
+			</tr>
+			</foreach>
+			<foreach name="data" item="v" key="k">
+			<tr class="active" id="J_id">
+				<eq name="k" value="0">
+				<td rowspan="{:count($data)}" class="text-center">实际结算</td>
+				</eq>
+				<td>{$v.name}</td>
+				<td>{$v.price}</td>
+				<td class="form-inline">
+					<div class="form-group">
+						<input type="text" class="form-control J_num" value="{$v.num}" name="id[{$v.id}]"/>
+					</div>
+				</td>
+				<td>{$v['price'] * $v['num']}</td>
+				<eq name="k" value="0">
+				<td rowspan="{:count($data)}">{$total}</td>
+				</eq>
+			</tr>
+			</foreach>
+        </table>
+		<br/>
+		<button type="submit" class="btn btn-primary js-ajax-submit" data-action="{:url('InOrder/add')}">提交</button> </div>
+    </form>
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+<script>
+    function reloadPage(win) {
+        win.location.href = win.location.href;
+    }
+	
+	
+	$(function(){
+		
+		<notempty name="data">
+		
+			$('#J_span').show();
+			$('#J_form').show();
+		</notempty>
+		
+		$('.J_num').on('blur', function(){
+			var num = parseFloat($(this).val()).toFixed(2);
+			if(isNaN(num)){
+				num = 0;
+			}
+			$(this).val(num);
+			
+			var total = 0;
+			
+			$('tr.active').find('input').each(function(){
+				$this = $(this);
+				$(this).closest('td').next('td').html(parseFloat($(this).val() * parseFloat($(this).closest('td').prev('td').html())).toFixed(2));
+				total += $(this).val() * parseFloat($(this).closest('td').prev('td').html());
+			});
+			
+			$('tr.active:first').find('td:last').html(parseFloat(total).toFixed(2));
+		});
+	});
+</script>
+</body>
+</html>

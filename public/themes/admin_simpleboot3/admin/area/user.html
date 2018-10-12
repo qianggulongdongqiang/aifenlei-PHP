@@ -1,0 +1,51 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li><a href="{:url('Area/index')}">区域管理</a></li>
+        <li><a href="{:url('Area/add')}">添加区域</a></li>
+        <li class="active"><a>配置回收员</a></li>
+    </ul>
+    <div class="row margin-top-20">
+        <div class="col-md-8">
+            <form class="js-ajax-form" action="{:url('Area/user')}" method="post">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="A">
+                        <div class="form-group">
+                            <label for="input-name"><span class="form-required"></span>{$name}</label>
+                        </div>
+						<div class="form-group">
+                            <label for="input-name"><span class="form-required"></span>站长</label>
+                            <div>
+                                <select name="master" class="form-control">
+									<option value="0">无</option>
+									<foreach name="user" item="i">
+									<option value="{$i.id}" <eq name="i.id" value="$master">selected="selected"</eq>><empty name="i['user_nickname']">{$i.user_login}<else>{$i.user_nickname}</empty></option>
+									</foreach>
+								</select>
+                            </div>
+                        </div>
+						<div class="form-group">
+                            <label for="input-name"><span class="form-required"></span>区域回收员</label>
+                            <div>
+									<foreach name="user" item="i">
+									<input type="checkbox" value="{$i.id}" name="user[]" <notempty name="collector[$i['id']]">checked="checked"</notempty>> <empty name="i['user_nickname']">{$i.user_login}<else>{$i.user_nickname}</empty><br/>
+									</foreach>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="hidden" name="id" value="{$id}">
+                    <button type="submit" class="btn btn-primary js-ajax-submit" data-refresh="0">{:lang('SAVE')}
+                    </button>
+                    <a class="btn btn-default" href="{:url('Area/index')}">{:lang('BACK')}</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="__STATIC__/js/admin.js"></script>
+</body>
+</html>

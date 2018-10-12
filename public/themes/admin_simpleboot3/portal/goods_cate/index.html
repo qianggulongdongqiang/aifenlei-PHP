@@ -1,0 +1,47 @@
+<include file="public@header" />
+</head>
+<body>
+	<div class="wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="{:url('GoodsCate/index')}">品类管理</a></li>
+			<li><a href="{:url('GoodsCate/add')}">添加品类</a></li>
+		</ul>
+		<form method="post" class="js-ajax-form" action="{:url('GoodsCate/listOrder')}">
+			<div class="table-actions">
+				<button type="submit" class="btn btn-primary btn-sm js-ajax-submit">{:lang('SORT')}</button>
+			</div>
+			<table class="table table-hover table-bordered table-list">
+				<thead>
+					<tr>
+						<th width="50">排序</th>
+						<th width="50">ID</th>
+						<th>品类名称</th>
+						<th>单位</th>
+                        <th>图片1</th>
+                        <th>图片2</th>
+						<th width="180">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					{$category_tree}
+				</tbody>
+				<tfoot>
+					<tr>
+						<th width="50">排序</th>
+						<th width="50">ID</th>
+						<th>品类名称</th>
+						<th>单位</th>
+                        <th>图片1</th>
+                        <th>图片2</th>
+						<th width="180">操作</th>
+					</tr>
+				</tfoot>
+			</table>
+			<div class="table-actions">
+				<button type="submit" class="btn btn-primary btn-sm js-ajax-submit">{:lang('SORT')}</button>
+			</div>
+		</form>
+	</div>
+	<script src="__STATIC__/js/admin.js"></script>
+</body>
+</html>

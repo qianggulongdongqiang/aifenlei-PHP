@@ -1,0 +1,117 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li><a href="{:url('GoodsCate/index')}">品类管理</a></li>
+        <li class="active"><a href="{:url('GoodsCate/add')}">添加品类</a></li>
+    </ul>
+    <div class="row margin-top-20">
+        <div class="col-md-8">
+            <form class="js-ajax-form" action="{:url('GoodsCate/addPost')}" method="post">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="A">
+                        <div class="form-group">
+                            <label for="input-parent"><span class="form-required">*</span>上级</label>
+                            <div>
+                                <select class="form-control" name="parent_id" id="input-parent">
+                                    <option value="0">作为一级品类</option>
+                                    {$categories_tree}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-name"><span class="form-required">*</span>品类名称</label>
+                            <div>
+                                <input type="text" class="form-control" id="input-name" name="name">
+                            </div>
+                        </div>
+						<div class="form-group">
+                            <label for="input-unit_name">属性</label>
+                            <div>
+                                <input type="text" class="form-control" id="input-unit_name" name="unit_name">
+                            </div>
+                        </div>
+						<div class="form-group">
+                            <label for="input-unit">单位</label>
+                            <div>
+                                <input type="text" class="form-control" id="input-unit" name="unit">
+                            </div>
+                        </div> 
+						<div class="form-group">
+                            <label for="input-op_type">模式</label>
+                            <div>
+                                <select id="input-op_type" name="op_type" class="form-control">
+									<option value="0">单选</option>
+									<option value="1">多选</option>
+								</select>
+                            </div>
+                        </div>
+						<div class="form-group">
+                            <label for="input-op_type">回收机专属</label>
+                            <div>
+                                <select id="input-is_machine" name="is_machine" class="form-control">
+									<option value="0">否</option>
+									<option value="1">是</option>
+								</select>
+                            </div>
+                        </div>
+						<div class="form-group">
+                            <label for="input-op_type">打印二维码</label>
+                            <div>
+                                <select id="input-is_qrcode" name="is_qrcode" class="form-control">
+									<option value="0">否</option>
+									<option value="1">是</option>
+								</select>
+                            </div>
+                        </div>
+						<div class="form-group">
+                            <label for="input-op_type">需要检验</label>
+                            <div>
+                                <select id="input-is_check" name="is_check" class="form-control">
+									<option value="0">否</option>
+									<option value="1">是</option>
+								</select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-img_1">图片1</label>
+                            <div>
+                                <input type='hidden' name='img_1' id='img_1'>
+                                <a href="javascript:uploadOneImage('图片上传','#img_1');">
+                                    <img src="__TMPL__/public/assets/images/default-thumbnail.png"
+                                         id='img_1-preview'
+                                         height='135' style='cursor: hand'/>
+                                </a>
+                                <input type="button" class="btn btn-sm"
+                                       onclick="$('#img_1-preview').attr('src','__TMPL__/public/assets/images/default-thumbnail.png');$('#img_1').val('');return false;"
+                                       value="取消图片">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-img_2">图片2</label>
+                            <div>
+                                <input type='hidden' name='img_2' id='img_2'>
+                                <a href="javascript:uploadOneImage('图片上传','#img_2');">
+                                    <img src="__TMPL__/public/assets/images/default-thumbnail.png"
+                                         id='img_2-preview'
+                                         height='135' style='cursor: hand'/>
+                                </a>
+                                <input type="button" class="btn btn-sm"
+                                       onclick="$('#img_2-preview').attr('src','__TMPL__/public/assets/images/default-thumbnail.png');$('#img_2').val('');return false;"
+                                       value="取消图片">
+                            </div>
+                        </div>   						
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary js-ajax-submit">{:lang('ADD')}</button>
+                    <a class="btn btn-default" href="{:url('GoodsCate/index')}">{:lang('BACK')}</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="__STATIC__/js/admin.js"></script>
+</body>
+</html>

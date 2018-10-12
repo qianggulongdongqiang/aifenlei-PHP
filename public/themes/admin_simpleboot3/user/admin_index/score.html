@@ -1,0 +1,44 @@
+<include file="public@header" />
+</head>
+<body>
+	<div class="wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="{:url('adminIndex/score')}">调整积分</a></li>
+		</ul>
+		<form class="form-horizontal js-ajax-form margin-top-20" role="form" method="post" action="{:url('adminIndex/score')}">
+        	<input type="hidden" name="id" value="{$id}" />
+			<div class="form-group">
+				<label for="input-user-nickname" class="col-sm-2 control-label">姓名</label>
+				<div class="col-md-6 col-sm-10">
+					<input type="text" class="form-control" value="{$user_nickname}" disabled="true">
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<label for="input-user_addr" class="col-sm-2 control-label">当前积分</label>
+				<div class="col-md-6 col-sm-10">
+					<input type="text" class="form-control" value="{$score}" disabled="true">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="input-score" class="col-sm-2 control-label">变动积分</label>
+				<div class="col-md-6 col-sm-10">
+					<input type="text" class="form-control" name="score" placeholder="正数为增加，负数为减少">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="input-remark"><span class="form-remark">*</span>说明</label>
+				<div class="col-md-6 col-sm-10">
+					<input type="text" class="form-control" id="input-remark" name="remark" placeholder="说明">
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button type="submit" class="btn btn-primary js-ajax-submit">{:lang('SAVE')}</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<script src="__STATIC__/js/admin.js"></script>
+</body>
+</html>

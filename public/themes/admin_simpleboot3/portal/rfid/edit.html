@@ -1,0 +1,41 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li><a href="{:url('Rfid/index')}">RFID列表</a></li>
+        <li><a href="{:url('Rfid/add')}">添加</a></li>
+        <li class="active"><a>绑定</a></li>
+    </ul>
+    <div class="row margin-top-20">
+        <div class="col-md-8">
+            <form class="js-ajax-form" action="{:url('Rfid/editPost')}" method="post">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="A">
+                        <div class="form-group">
+							<label for="input-code"><span class="form-required">*</span>Code</label>
+                            <div>
+                                {$code}
+                            </div>
+                        </div>
+						<div class="form-group">
+                            <label for="input-name"><span class="form-required">*</span>绑定用户手机号</label>
+                            <div>
+                                <input type="text" class="form-control" id="input-point" name="user_mobile">
+                            </div>
+                        </div>    	
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="hidden" name="id" value="{$id}">
+                    <button type="submit" class="btn btn-primary js-ajax-submit">绑定
+                    </button>
+                    <a class="btn btn-default" href="{:url('Rfid/index')}">{:lang('BACK')}</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="__STATIC__/js/admin.js"></script>
+</body>
+</html>

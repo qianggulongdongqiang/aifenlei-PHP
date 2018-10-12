@@ -1,0 +1,95 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="javascript:;">RFID列表</a></li>
+        <li><a href="{:url('Rfid/add')}">添加</a></li>
+		<li><a href="{:url('Rfid/import')}">导入</a></li>
+    </ul>
+	<form class="well form-inline margin-top-20" method="post" action="{:url('Rfid/index')}">
+		类型：
+        <select class="form-control" name="type" style="width: 140px;">
+            <option value='0'>全部</option>
+            <option value='1' <eq name="type" value="1">selected="selected"</eq>>已绑定</option>
+			<option value='2' <eq name="type" value="2">selected="selected"</eq>>未绑定</option>
+        </select> &nbsp;&nbsp;
+        
+        <input type="submit" class="btn btn-primary" value="搜索"/>
+    </form>
+    <form class="js-ajax-form" action="" method="post">
+		<div class="table-actions">
+            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
+                    data-action="{:url('Rfid/unbind')}" data-subcheck="true">解绑
+            </button>
+        </div>
+        <table class="table table-hover table-bordered table-list">
+            <thead>
+            <tr>
+				<th width="15">
+                    <label>
+                        <input type="checkbox" class="js-check-all" data-direction="x" data-checklist="js-check-x">
+                    </label>
+                </th>
+                <th>序列号</th>
+                <th>新增日期</th>
+				<th>绑定日期</th>
+				<th>绑定用户姓名</th>
+				<th>绑定用户手机号</th>
+                <th width="90">操作</th>
+            </tr>
+            </thead>
+            <foreach name="data" item="vo">
+                <tr>
+					<td>
+						<notempty name="vo.user_id">
+                        <input type="checkbox" class="js-check" data-yid="js-check-y" data-xid="js-check-x" name="ids[]"
+                               value="{$vo.id}" title="ID:{$vo.id}">
+						</notempty>
+                    </td>
+                    <td><b>{$vo.code}</b></td>
+                    <td><notempty name="vo.add_time">{:date('Y-m-d',$vo.add_time)}</notempty></td>
+                    <td><notempty name="vo.bind_time">{:date('Y-m-d',$vo.bind_time)}</notempty></td>
+                    <td><notempty name="vo.user_id">{$vo.user.user_nickname}</notempty></td>
+					<td>{$vo.user.mobile}</td>
+                    <td>
+						<empty name="vo.user_id">
+                        <a href="{:url('Rfid/edit',array('id'=>$vo['id']))}">绑定</a>
+						</empty>
+						<a class="js-ajax-delete" href="{:url('Rfid/delete',array('id'=>$vo['id']))}">{:lang('DELETE')}</a>
+                    </td>
+                </tr>
+            </foreach>
+            <tfoot>
+            <tr>
+				<th width="15">
+                    <label>
+                        <input type="checkbox" class="js-check-all" data-direction="x" data-checklist="js-check-x">
+                    </label>
+                </th>
+                <th>序列号</th>
+                <th>新增日期</th>
+				<th>绑定日期</th>
+				<th>绑定用户姓名</th>
+				<th>绑定用户手机号</th>
+                <th width="90">操作</th>
+            </tr>
+            </tfoot>
+        </table>
+		<div class="table-actions">
+            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
+                    data-action="{:url('Rfid/unbind')}" data-subcheck="true">解绑
+            </button>
+        </div>
+        <ul class="pagination">{$page|default=''}</ul>
+    </form>
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+<script>
+    function reloadPage(win) {
+        win.location.reload();
+    }
+
+</script>
+</body>
+</html>

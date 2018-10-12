@@ -1,0 +1,51 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="javascript:;">列表</a></li>
+        <li><a href="{:url('GoodsCateCode/add',['cid'=>$cid])}">添加</a></li>
+		<li><a href="{:url('GoodsCateCode/import',['cid'=>$cid])}">导入</a></li>
+    </ul>
+	<br/>
+    <form class="js-ajax-form" action="" method="post">
+        <table class="table table-hover table-bordered table-list">
+            <thead>
+            <tr>
+				<th width="15">
+                    <label>
+                        <input type="checkbox" class="js-check-all" data-direction="x" data-checklist="js-check-x">
+                    </label>
+                </th>
+                <th>序列号</th>
+                <th>品类名</th>
+                <th width="90">操作</th>
+            </tr>
+            </thead>
+            <foreach name="data" item="vo">
+                <tr>
+					<td>
+                        <input type="checkbox" class="js-check" data-yid="js-check-y" data-xid="js-check-x" name="ids[]"
+                               value="{$vo.id}" title="ID:{$vo.id}">
+                    </td>
+                    <td><b>{$vo.code}</b></td>
+					<td>{$vo.cate.name}<eq name="vo.cate.is_machine" value="1">(自助)</eq></td>
+                    <td>
+						<a class="js-ajax-delete" href="{:url('GoodsCateCode/delete',array('id'=>$vo['id']))}">{:lang('DELETE')}</a>
+                    </td>
+                </tr>
+            </foreach>
+        
+        </table>
+        <ul class="pagination">{$page|default=''}</ul>
+    </form>
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+<script>
+    function reloadPage(win) {
+        win.location.reload();
+    }
+
+</script>
+</body>
+</html>

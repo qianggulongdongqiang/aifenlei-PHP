@@ -1,0 +1,44 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+		<li><a href="{:url('UserScore/index')}">积分记录</a></li>
+        <li class="active"><a href="{:url('UserScore/add')}">调整</a></li>
+    </ul>
+    <div class="row margin-top-20">
+        <div class="col-md-8">
+            <form class="js-ajax-form" action="{:url('UserScore/addPost')}" method="post">
+                <div class="tab-content">
+                    <div class="tab-pane active">
+                        <div class="form-group">
+                            <label for="input-user_mobile"><span class="form-required">*</span>手机号</label>
+                            <div>
+                                <input type="text" class="form-control" id="input-user_mobile" name="user_mobile" placeholder="住户手机号">
+                            </div>
+                        </div> 
+						<div class="form-group">
+                            <label for="input-score"><span class="form-required">*</span>积分</label>
+                            <div>
+                                <input type="text" class="form-control" id="input-score" name="score" placeholder="可以填写正负整数">
+                            </div>
+                        </div> 
+						<div class="form-group">
+                            <label for="input-remark"><span class="form-remark">*</span>说明</label>
+                            <div>
+                                <input type="text" class="form-control" id="input-remark" name="remark" placeholder="说明">
+                            </div>
+                        </div>						
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary js-ajax-submit">{:lang('ADD')}</button>
+                    <a class="btn btn-default" href="{:url('UserScore/index')}">{:lang('BACK')}</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="__STATIC__/js/admin.js"></script>
+</body>
+</html>

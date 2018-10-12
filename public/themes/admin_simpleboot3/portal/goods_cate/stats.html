@@ -1,0 +1,41 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="javascript:;">库存统计</a></li>
+    </ul>
+
+    <form class="js-ajax-form" action="" method="post">
+        <table class="table table-list">
+            <thead>
+            <tr>
+				<th>资源种类</th>
+				<th>结算单价</th>
+				<th>重量（kg）/ 数量（个）</th>
+				<th>结算金额</th>
+				<th>合计</th>
+            </tr>
+            </thead>
+			<foreach name="data" item="v" key="k">
+			<tr class="active">
+				<td>{$v.name}</td>
+				<td>{$v.settlement_out_price}</td>
+				<td>{$v.stock}</td>
+				<td>{$v.total}</td>
+				<eq name="k" value="0">
+				<td rowspan="{:count($data)}">{$total}</td>
+				</eq>
+			</tr>
+			</foreach>
+        </table>
+    </form>
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+<script>
+    function reloadPage(win) {
+        win.location.href = win.location.href;
+    }
+</script>
+</body>
+</html>

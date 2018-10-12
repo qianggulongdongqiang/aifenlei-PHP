@@ -1,0 +1,238 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap">
+    <ul class="nav nav-tabs">
+        <li class="active"><a>{$title}</a></li>
+        <li><a href="{:url('adminIndex/add', ['type'=>$type])}">新增{$title}</a></li>
+    </ul>
+    <form class="well form-inline margin-top-20" method="post" action="{:url('user/adminIndex/index', ['type'=>$type])}">
+        <input class="form-control" type="text" name="keyword" style="width: 200px;" value="{:input('request.keyword')}"
+               placeholder="账户编号/姓名/手机">
+		<eq name="type" value="2">
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		排序方式:
+		<select class="form-control" name="order">
+			<option value='1' <eq name="order" value="1">selected="selected"</eq>>注册时间倒序</option>
+			<option value='2' <eq name="order" value="2">selected="selected"</eq>>积分高到低</option>
+			<option value='3' <eq name="order" value="3">selected="selected"</eq>>积分低到高</option>
+		</select>
+		</eq>
+		<eq name="type" value="4">
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		<select class="form-control" name="state">
+			<option value='-1' <eq name="state" value="-1">selected="selected"</eq>>状态</option>
+			<option value='0' <eq name="state" value="0">selected="selected"</eq>>未同步</option>
+			<option value='10' <eq name="state" value="10">selected="selected"</eq>>正常</option>
+			<option value='20' <eq name="state" value="20">selected="selected"</eq>>离线</option>
+			<option value='30' <eq name="state" value="30">selected="selected"</eq>>故障</option>
+			<option value='40' <eq name="state" value="40">selected="selected"</eq>>满箱</option>
+		</select>
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		<select class="form-control" id="area_1" name="area_1">
+			<option value="">城市</option>
+			<foreach name="area" item="a">
+			<option value="{$a.name}" data-id="{$a.id}">{$a.name}</option>
+			</foreach>
+		</select>
+		<select class="form-control" id="area_2" name="area_2">
+			<option value="">区域</option>
+		</select>
+		<select class="form-control" id="area_3" name="area_3">
+			<option value="">小区</option>
+		</select>
+		<br/><br/>
+		<select class="form-control" id="machine_type_1" name="machine_type_1">
+			<option value="">一级机器类型</option>
+			<foreach name="machine_type" item="a">
+			<option value="{$a.id}" data-id="{$a.id}">{$a.name}</option>
+			</foreach>
+		</select>
+		<select class="form-control" id="machine_type_2" name="machine_type_2">
+			<option value="">二级机器类型</option>
+		</select>
+		</eq>
+        <input type="submit" class="btn btn-primary" value="搜索"/>
+    </form>
+    <form method="post" class="js-ajax-form">
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th><if condition="$type eq 4" />登录帐号<else/>账户编号</if></th>
+                <if condition="$type eq 2" />
+                <th>姓名</th>
+                <th>性别</th>
+                <th>联系方式</th>
+                <th>住址</th>
+                <th>当前积分</th>
+
+            	<elseif condition="$type eq 3" />
+                <th>姓名</th>
+                <th>联系方式</th>
+                <th>社区</th>
+            	<elseif condition="$type eq 3" />
+                <th>联系方式</th>
+                <th>社区</th>
+				<elseif condition="$type eq 4" />
+				<th>位置</th>
+            	</if>
+                <th>{:lang('STATUS')}</th>
+                <th>{:lang('ACTIONS')}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <php>
+				
+			if($type == 4){
+				$user_statuses=array("0"=>'未同步',"1"=>'未同步',"2"=>'未同步', "10"=>"正常", "20"=>"离线","30"=>"故障","40"=>"满箱");
+			}else{
+				$user_statuses=array("0"=>lang('USER_STATUS_BLOCKED'),"1"=>lang('USER_STATUS_ACTIVATED'),"2"=>lang('USER_STATUS_UNVERIFIED'));
+			}	
+                $sexs=array("0"=>lang('GENDER_SECRECY'),"1"=>lang('MALE'),"2"=>lang('FEMALE'));
+				$class = ["0"=>'text-default',"1"=>'text-default',"2"=>'text-default', "10"=>"text-default", "20"=>"text-warning","30"=>"text-danger","40"=>"text-info"];
+            </php>
+            <foreach name="list" item="vo">
+            	
+                <tr>
+                    <td>{$vo.id}</td>
+                    <td>{$vo['user_login']?$vo['user_login']:($vo['mobile']?$vo['mobile']:lang('THIRD_PARTY_USER'))}
+                    </td>
+                    <if condition="$type eq 2" />
+                    <td>{$vo['user_nickname']?$vo['user_nickname']:lang('NOT_FILLED')}</td>
+                    <td>{$sexs[$vo['sex']]}</td>
+                    <td>{$vo.mobile}</td>
+                    <td>{$vo['user_addr']}</td>
+                    <td>{$vo['score']}</td>
+                    <elseif condition="$type eq 3" />
+                    <td>{$vo['user_nickname']?$vo['user_nickname']:lang('NOT_FILLED')}</td>
+                    <td>{$vo.mobile}</td>
+                    <td>{$vo['user_addr']}</td>
+                    <elseif condition="$type eq 4" />
+                    <td>{$vo['user_addr']}</td>
+                    </if>
+                    <td class="{$class[$vo['user_status']]}">{$user_statuses[$vo['user_status']]}</td>
+                    <td>
+                        <neq name="vo.id" value="1">
+                            <empty name="vo.user_status">
+                                <a href="{:url('adminIndex/cancelban',array('id'=>$vo['id']))}"
+                                   class="js-ajax-dialog-btn"
+                                   data-msg="{:lang('ACTIVATE_USER_CONFIRM_MESSAGE')}">{:lang('ACTIVATE_USER')}</a>
+                                <else/>
+                                <a href="{:url('adminIndex/ban',array('id'=>$vo['id']))}" class="js-ajax-dialog-btn"
+                                   data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">{:lang('BLOCK_USER')}</a>
+                            </empty>
+                            <a href='{:url("adminIndex/edit",array("id"=>$vo["id"]))}'>{:lang('EDIT')}</a>
+                            <else/>
+                            <a style="color: #ccc;">{:lang('BLOCK_USER')}</a>
+                        </neq>
+						<eq name="vo.user_type" value="2">
+						<a class="js-ajax-delete" href="{:url('adminIndex/delete',array('id'=>$vo['id']))}">{:lang('DELETE')}</a>
+						
+						<a href="{:url('adminIndex/score',array('id'=>$vo['id']))}">调整积分</a>
+						</eq>
+						<eq name="vo.user_type" value="3">
+						<a class="js-ajax-delete" href="{:url('adminIndex/delete_collecter',array('id'=>$vo['id']))}">{:lang('DELETE')}</a>
+						</eq>
+						<eq name="vo.user_type" value="4">
+						<a href="{:url('adminIndex/machine_state_log',array('id'=>$vo['id']))}">状态日志</a>
+						</eq>
+                    </td>
+                </tr>
+            </foreach>
+            </tbody>
+        </table>
+        <div class="pagination">{$page}</div>
+    </form>
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+<script>
+	var area_1 = "{$area_1|default=''}";
+	var area_2 = "{$area_2|default=''}";
+	var area_3 = "{$area_3|default=''}";
+	var machine_type_1 = "{$machine_type_1|default=0}";
+	var machine_type_2 = "{$machine_type_2|default=0}";
+	
+	$(function(){
+		$('#area_1').on('change', function(){
+			var url = "{:url('adminIndex/getArea')}";
+			if($(this).find('option:selected').val() != ''){
+				$.post(url, {id:$(this).find('option:selected').attr('data-id')}, function(re){
+					var html = '<option value="">--请选择--</option>';
+					if(re.code == 1){				
+						var data = re.data;
+						for(var i in data){
+							html += '<option value="' +data[i].name+ '" data-id="' +data[i].id+ '">' +data[i].name+ '</option>';
+						}
+					}
+					$('#area_2').html(html);
+					
+					if(area_2 != ''){
+						$('#area_2').find('option[value="' +area_2+ '"]').prop('selected', true);
+						$('#area_2').trigger('change');
+						area_2 = '';
+					}
+				});
+			}
+		});
+		$('#area_2').on('change', function(){
+			var url = "{:url('adminIndex/getArea')}";
+			if($(this).find('option:selected').val() != ''){
+				$.post(url, {id:$(this).find('option:selected').attr('data-id')}, function(re){
+					var html = '<option value="">--请选择--</option>';
+					if(re.code == 1){				
+						var data = re.data;
+						for(var i in data){
+							html += '<option value="' +data[i].name+ '" data="' +data[i].id+ '">' +data[i].name+ '</option>';
+						}
+					}
+					$('#area_3').html(html);
+					
+					$('#area_3').on('change', function(){
+						$("[name='area_id']").val($(this).find(':selected').attr('data'));
+					});
+					
+					if(area_3 != ''){
+						$('#area_3').find('option[value="' +area_3+ '"]').prop('selected', true);
+						area_3 = '';
+					}
+				});
+			}
+		});
+		
+		$('#machine_type_1').on('change', function(){
+			var url = "{:url('adminIndex/getMachineType')}";
+			if($(this).find('option:selected').val() != ''){
+				$.post(url, {id:$(this).find('option:selected').attr('data-id')}, function(re){
+					var html = '<option value="">--请选择--</option>';
+					if(re.code == 1){				
+						var data = re.data;
+						for(var i in data){
+							html += '<option value="' +data[i].id+ '" data-id="' +data[i].id+ '">' +data[i].name + '[' + data[i].unit_name + ':' + data[i].unit + ']' + '</option>';
+						}
+					}
+					$('#machine_type_2').html(html);
+					
+					if(machine_type_2 != 0){
+						$('#machine_type_2').find('option[value="' +machine_type_2+ '"]').prop('selected', true);
+						machine_type_2 = 0;
+					}
+				});
+			}
+		});
+		
+		if(area_1 != ''){
+			$('#area_1').find('option[value="' +area_1+ '"]').prop('selected', true);
+			$('#area_1').trigger('change');
+			area_1 = '';
+		}
+
+		if(machine_type_1 != 0){
+			$('#machine_type_1').find('option[value="' +machine_type_1+ '"]').prop('selected', true);
+			$('#machine_type_1').trigger('change');
+			machine_type_1 = 0;
+		}
+	});
+	</script>
+</body>
+</html>

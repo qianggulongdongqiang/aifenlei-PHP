@@ -1,0 +1,87 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="javascript:;">所有入库价格</a></li>
+        <li><a href="{:url('GoodsCate/add')}">添加品类</a></li>
+    </ul>
+	
+    <form class="js-ajax-form" action="" method="post">
+        <div class="table-actions">
+            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
+                    data-action="{:url('GoodsCate/online',['type'=>'in'])}" data-subcheck="true">上线
+            </button>
+            <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
+                    data-action="{:url('GoodsCate/offline',['type'=>'in'])}" data-subcheck="true">下线
+            </button>
+        </div>
+        <table class="table table-hover table-bordered table-list">
+            <thead>
+            <tr>
+                <th width="15">
+                    <label>
+                        <input type="checkbox" class="js-check-all" data-direction="x" data-checklist="js-check-x">
+                    </label>
+                </th>
+                <th>品类</th>
+                <th>收购单价</th>
+                <th>收购积分</th>
+                <th>结算单价</th>
+                <th width="70">状态</th>
+                <th width="90">操作</th>
+            </tr>
+            </thead>
+            <foreach name="data" item="vo">
+                <tr>
+                    <td>
+                        <input type="checkbox" class="js-check" data-yid="js-check-y" data-xid="js-check-x" name="ids[]"
+                               value="{$vo.id}" title="ID:{$vo.id}">
+                    </td>
+                    <td>{$vo.name}</td>
+                    <td>{$vo.purchasing_price}</td>
+                    <td>{$vo.purchasing_point}</td>
+                    <td>{$vo.settlement_in_price}</td>
+                    <td>
+                        <notempty name="vo.in_status">
+                            <a data-toggle="tooltip" title="已上线"><i class="fa fa-check"></i></a>
+                            <else/>
+                            <a data-toggle="tooltip" title="未上线"><i class="fa fa-close"></i></a>
+                        </notempty>
+                    </td>
+                    <td>
+                        <a href="{:url('GoodsCate/inedit',array('id'=>$vo['id']))}">{:lang('EDIT')}</a>
+                    </td>
+                </tr>
+            </foreach>
+            <tfoot>
+            <tr>
+                <th width="15"><label><input type="checkbox" class="js-check-all" data-direction="x"
+                                             data-checklist="js-check-x"></label></th>
+                <th>品类</th>
+                <th>收购单价</th>
+                <th>收购积分</th>
+                <th>结算单价</th>
+                <th width="70">状态</th>
+                <th width="90">操作</th>
+            </tr>
+            </tfoot>
+        </table>
+        <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
+			data-action="{:url('GoodsCate/online',['type'=>'in'])}" data-subcheck="true">上线
+        </button>
+        <button class="btn btn-primary btn-sm js-ajax-submit" type="submit"
+            data-action="{:url('GoodsCate/offline',['type'=>'in'])}" data-subcheck="true">下线
+		</button>
+        <ul class="pagination">{$page|default=''}</ul>
+    </form>
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+<script>
+    function reloadPage(win) {
+        win.location.reload();
+    }
+
+</script>
+</body>
+</html>

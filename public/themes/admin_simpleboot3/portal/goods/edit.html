@@ -1,0 +1,41 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li><a href="{:url('Goods/index')}">礼品分值</a></li>
+        <li><a href="{:url('Goods/add')}">添加礼品</a></li>
+        <li class="active"><a>编辑品类</a></li>
+    </ul>
+    <div class="row margin-top-20">
+        <div class="col-md-8">
+            <form class="js-ajax-form" action="{:url('Goods/editPost')}" method="post">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="A">
+                        <div class="form-group">
+                            <label for="input-name"><span class="form-required">*</span>礼品名称</label>
+                            <div>
+                                <input type="text" class="form-control" id="input-name" name="name" value="{$name}">
+                            </div>
+                        </div>
+						<div class="form-group">
+                            <label for="input-name"><span class="form-required">*</span>消耗积分</label>
+                            <div>
+                                <input type="text" class="form-control" id="input-point" name="point" value="{$point}">
+                            </div>
+                        </div>    	
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="hidden" name="id" value="{$id}">
+                    <button type="submit" class="btn btn-primary js-ajax-submit" data-refresh="0">{:lang('SAVE')}
+                    </button>
+                    <a class="btn btn-default" href="{:url('Goods/index')}">{:lang('BACK')}</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="__STATIC__/js/admin.js"></script>
+</body>
+</html>

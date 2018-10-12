@@ -1,0 +1,210 @@
+<include file="public@header" />
+</head>
+<body>
+	<div class="wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="{:url('adminIndex/edit')}">{:lang('ADMIN_USER_USERINFO')}</a></li>
+		</ul>
+		<form class="form-horizontal js-ajax-form margin-top-20" role="form" method="post" action="{:url('adminIndex/edit')}">
+        	<input type="hidden" name="id" value="{$id}" />
+			<input type="hidden" name="area_id" value="{$area_id}" />
+			<if condition="$user_type neq 4">
+			<div class="form-group">
+				<label for="input-user-nickname" class="col-sm-2 control-label">姓名</label>
+				<div class="col-md-6 col-sm-10">
+					<input type="text" class="form-control" id="input-user-nickname" name="user_nickname" value="{$user_nickname}">
+				</div>
+			</div>
+			</if>
+			<eq name="user_type" value="2">
+			<div class="form-group">
+				<label for="input-gender" class="col-sm-2 control-label">性别</label>
+				<div class="col-md-6 col-sm-10">
+					<select class="form-control" name="sex" id="input-gender">
+						<php>$sexs=array("0"=>lang('GENDER_SECRECY'),"1"=>lang('MALE'),"2"=>lang('FEMALE'));</php>
+						<foreach name="sexs" item="vo">
+							<php>$sexselected=$key==$sex?"selected":"";</php>
+							<option value="{$key}" {$sexselected}>{$vo}</option>
+						</foreach>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="input-birthday" class="col-sm-2 control-label">生日</label>
+				<div class="col-md-6 col-sm-10">
+					<input type="text" class="form-control js-bootstrap-date" id="input-birthday" name="birthday" value="{:date('Y-m-d',$birthday)}" placeholder="2013-01-04">
+				</div>
+			</div>
+			</eq>
+			<div class="form-group">
+				<label for="input-user_addr" class="col-sm-2 control-label">区域</label>
+				<div class="col-md-6 col-sm-10">
+					<select class="form-control" id="area_1" name="area_1">
+						<option value="">--请选择--</option>
+						<foreach name="area" item="a">
+						<option value="{$a.name}" data-id="{$a.id}">{$a.name}</option>
+						</foreach>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="input-user_addr" class="col-sm-2 control-label"></label>
+				<div class="col-md-6 col-sm-10">
+					<select class="form-control" id="area_2" name="area_2">
+						<option value="">--请选择--</option>	
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="input-user_addr" class="col-sm-2 control-label"></label>
+				<div class="col-md-6 col-sm-10">
+					<select class="form-control" id="area_3" name="area_3">
+						<option value="">--请选择--</option>	
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="input-user_addr" class="col-sm-2 control-label"><if condition="$user_type eq 2">住址<elseif condition="$user_type eq 4">机器位置<else>社区</if></label>
+				<div class="col-md-6 col-sm-10">
+					<input type="text" class="form-control" id="input-user_addr" name="user_addr" value="{$user_addr}" placeholder="详细地址">
+				</div>
+			</div>
+			<if condition="$user_type neq 4">
+			<div class="form-group">
+				<label for="input-user_addr" class="col-sm-2 control-label">联系方式</label>
+				<div class="col-md-6 col-sm-10">
+					<input type="text" class="form-control" id="input-mobile" name="mobile" value="{$mobile}" placeholder="联系方式">
+				</div>
+			</div>
+			</if>
+			<div class="form-group">
+				<label for="input-user_pass" class="col-sm-2 control-label">{:lang('PASSWORD')}</label>
+				<div class="col-md-6 col-sm-10">
+					<input type="text" class="form-control" id="input-user_pass" name="user_pass" placeholder="******">
+				</div>
+			</div>
+			<if condition="$user_type eq 4">
+			<div class="form-group">
+				<label for="input-signature" class="col-sm-2 control-label">硬件编号</label>
+				<div class="col-md-6 col-sm-10">
+					<input type="text" class="form-control" id="input-signature" name="signature" value="{$signature}"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="input-user_addr" class="col-sm-2 control-label">机器类型</label>
+				<div class="col-md-6 col-sm-10">
+					<select class="form-control" id="machine_type_1" name="machine_type_1">
+						<option value="">--请选择--</option>
+						<foreach name="machine_type" item="a">
+						<option value="{$a.id}" data-id="{$a.id}">{$a.name}</option>
+						</foreach>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="input-user_addr" class="col-sm-2 control-label"></label>
+				<div class="col-md-6 col-sm-10">
+					<select class="form-control" id="machine_type_2" name="machine_type_2">
+						<option value="">--请选择--</option>	
+					</select>
+				</div>
+			</div>
+			</if>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button type="submit" class="btn btn-primary js-ajax-submit">{:lang('SAVE')}</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<script src="__STATIC__/js/admin.js"></script>
+	<script>
+	var area_1 = "{$area_1}";
+	var area_2 = "{$area_2}";
+	var area_3 = "{$area_3}";
+	var machine_type_1 = "{$more.machine_type_1|default=0}";
+	var machine_type_2 = "{$more.machine_type_2|default=0}";
+	
+	$(function(){
+		$('#area_1').on('change', function(){
+			var url = "{:url('adminIndex/getArea')}";
+			if($(this).find('option:selected').val() != ''){
+				$.post(url, {id:$(this).find('option:selected').attr('data-id')}, function(re){
+					var html = '<option value="">--请选择--</option>';
+					if(re.code == 1){				
+						var data = re.data;
+						for(var i in data){
+							html += '<option value="' +data[i].name+ '" data-id="' +data[i].id+ '">' +data[i].name+ '</option>';
+						}
+					}
+					$('#area_2').html(html);
+					
+					if(area_2 != ''){
+						$('#area_2').find('option[value="' +area_2+ '"]').prop('selected', true);
+						$('#area_2').trigger('change');
+						area_2 = '';
+					}
+				});
+			}
+		});
+		$('#area_2').on('change', function(){
+			var url = "{:url('adminIndex/getArea')}";
+			if($(this).find('option:selected').val() != ''){
+				$.post(url, {id:$(this).find('option:selected').attr('data-id')}, function(re){
+					var html = '<option value="">--请选择--</option>';
+					if(re.code == 1){				
+						var data = re.data;
+						for(var i in data){
+							html += '<option value="' +data[i].name+ '" data="' +data[i].id+ '">' +data[i].name+ '</option>';
+						}
+					}
+					$('#area_3').html(html);
+					
+					$('#area_3').on('change', function(){
+						$("[name='area_id']").val($(this).find(':selected').attr('data'));
+					});
+					
+					if(area_3 != ''){
+						$('#area_3').find('option[value="' +area_3+ '"]').prop('selected', true);
+						area_3 = '';
+					}
+				});
+			}
+		});
+		
+		$('#machine_type_1').on('change', function(){
+			var url = "{:url('adminIndex/getMachineType')}";
+			if($(this).find('option:selected').val() != ''){
+				$.post(url, {id:$(this).find('option:selected').attr('data-id')}, function(re){
+					var html = '<option value="">--请选择--</option>';
+					if(re.code == 1){				
+						var data = re.data;
+						for(var i in data){
+							html += '<option value="' +data[i].id+ '" data-id="' +data[i].id+ '">' +data[i].name + '[' + data[i].unit_name + ':' + data[i].unit + ']' + '</option>';
+						}
+					}
+					$('#machine_type_2').html(html);
+					
+					if(machine_type_2 != 0){
+						$('#machine_type_2').find('option[value="' +machine_type_2+ '"]').prop('selected', true);
+						machine_type_2 = 0;
+					}
+				});
+			}
+		});
+		
+		if(area_1 != ''){
+			$('#area_1').find('option[value="' +area_1+ '"]').prop('selected', true);
+			$('#area_1').trigger('change');
+			area_1 = '';
+		}
+
+		if(machine_type_1 != 0){
+			$('#machine_type_1').find('option[value="' +machine_type_1+ '"]').prop('selected', true);
+			$('#machine_type_1').trigger('change');
+			machine_type_1 = 0;
+		}
+	});
+	</script>
+</body>
+</html>

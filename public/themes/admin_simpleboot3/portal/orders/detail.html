@@ -1,0 +1,66 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li><a href="{:url('Orders/index')}">订单列表</a></li>
+		<li class="active"><a href="javascript:;">订单详情</a></li>
+    </ul>
+	<br />
+	<div class="row">
+		<div class="col-md-12">
+			<table class="table table-bordered">
+				<tr>
+					<th width="100">订单日期</th>
+					<td>{:date('Y-m-d H:i', $add_time)}</td>
+					<th width="100">账户编号</th>
+					<td>{$user.user_login}</td>
+				</tr>
+				<tr>
+					<th>订单号</th>
+					<td>{$order_sn}</td>
+					<th>住户姓名</th>
+					<td>{$buyer_name}</td>
+				</tr>
+				<tr>
+					<th>回收员</th>
+					<td>{$collecter_name}</td>
+					<th>联系方式</th>
+					<td>{$buyer_phone}</td>
+				</tr>
+				<tr>
+					<th></th>
+					<td></td>
+					<th>住户地址</th>
+					<td>{$buyer_addr}</td>
+				</tr>
+			</table>
+			
+			<table class="table table-bordered table-list">
+				<thead>
+					<tr class="active">
+						<th>资源种类</th>
+						<th>单价</th>
+						<th>重量（kg）/ 数量（个）</th>
+						<th>所得积分</th>
+						<th class="text-center">合计</th>
+					</tr>
+				</thead>
+				<foreach name="goods" item="g" key="k">
+				<tr <if condition="$k%2 eq 1">class="success"</if>>
+					<td>{$g.name}</td>
+					<td>{$g.p}</td>
+					<td>{$g.num}</td>
+					<td>{$g.point}</td>
+					<eq name="k" value="0">
+					<td rowspan="{:count($goods)}" class="text-center">{$points_number}</td>
+					</eq>
+				</tr>
+				</foreach>
+			</table>
+		</div>
+	</div>
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+</body>
+</html>

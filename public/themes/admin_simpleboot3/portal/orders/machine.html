@@ -1,0 +1,176 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap">
+    <ul class="nav nav-tabs">
+        <li class="active"><a>回收机订单列表</a></li>
+    </ul>
+    <form class="well form-inline margin-top-20" method="post" action="{:url('Orders/machine')}">
+        <input class="form-control" type="text" name="keyword" style="width: 200px;" value="{:input('request.keyword')}"
+               placeholder="登录帐号/硬件编号">
+
+
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		<select class="form-control" id="area_1" name="area_1">
+			<option value="">城市</option>
+			<foreach name="area" item="a">
+			<option value="{$a.name}" data-id="{$a.id}">{$a.name}</option>
+			</foreach>
+		</select>
+		<select class="form-control" id="area_2" name="area_2">
+			<option value="">区域</option>
+		</select>
+		<select class="form-control" id="area_3" name="area_3">
+			<option value="">小区</option>
+		</select>
+
+		<select class="form-control" id="machine_type_1" name="machine_type_1">
+			<option value="">一级机器类型</option>
+			<foreach name="machine_type" item="a">
+			<option value="{$a.id}" data-id="{$a.id}">{$a.name}</option>
+			</foreach>
+		</select>
+		<select class="form-control" id="machine_type_2" name="machine_type_2">
+			<option value="">二级机器类型</option>
+		</select>
+
+        <input type="submit" class="btn btn-primary" value="搜索"/>
+    </form>
+    <form class="js-ajax-form" action="" method="post">
+        <table class="table table-hover table-bordered table-list">
+            <thead>
+            <tr>
+                <th>日期</th>
+                <th>订单号</th>
+				<th>资源种类</th>
+				<th>重量（kg）/ 数量（个）</th>
+				<th>兑换积分</th>
+                <th width="90">操作</th>
+            </tr>
+            </thead>
+            <foreach name="data" item="vo">
+				<php>$goods = json_decode($vo['goods'], true);</php>
+                <tr>
+                    <td><b>{:date('Y-m-d H:i',$vo['add_time'])}</b></td>
+                    <td>{$vo.order_sn}</td>
+                    <td>
+                        <foreach name="goods" item="g">
+						{$g.name}</br>
+						</foreach>
+                    </td>
+					<td>
+                        <foreach name="goods" item="g">
+						{$g.num}</br>
+						</foreach>
+                    </td>
+					<td>{$vo.points_number}</td>
+                    <td>
+                        <a href="{:url('Orders/detail',array('id'=>$vo['order_id']))}">详情</a>
+                    </td>
+                </tr>
+            </foreach>
+            <tfoot>
+            <tr>
+                <th>日期</th>
+                <th>订单号</th>
+				<th>资源种类</th>
+				<th>重量（kg）/ 数量（个）</th>
+				<th>兑换积分</th>
+                <th width="90">操作</th>
+            </tr>
+            </tfoot>
+        </table>
+        <ul class="pagination">{$page|default=''}</ul>
+    </form>
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+<script>
+	var area_1 = "{$area_1|default=''}";
+	var area_2 = "{$area_2|default=''}";
+	var area_3 = "{$area_3|default=''}";
+	var machine_type_1 = "{$machine_type_1|default=0}";
+	var machine_type_2 = "{$machine_type_2|default=0}";
+	
+	$(function(){
+		$('#area_1').on('change', function(){
+			var url = "{:url('user/adminIndex/getArea')}";
+			if($(this).find('option:selected').val() != ''){
+				$.post(url, {id:$(this).find('option:selected').attr('data-id')}, function(re){
+					var html = '<option value="">--请选择--</option>';
+					if(re.code == 1){				
+						var data = re.data;
+						for(var i in data){
+							html += '<option value="' +data[i].name+ '" data-id="' +data[i].id+ '">' +data[i].name+ '</option>';
+						}
+					}
+					$('#area_2').html(html);
+					
+					if(area_2 != ''){
+						$('#area_2').find('option[value="' +area_2+ '"]').prop('selected', true);
+						$('#area_2').trigger('change');
+						area_2 = '';
+					}
+				});
+			}
+		});
+		$('#area_2').on('change', function(){
+			var url = "{:url('user/adminIndex/getArea')}";
+			if($(this).find('option:selected').val() != ''){
+				$.post(url, {id:$(this).find('option:selected').attr('data-id')}, function(re){
+					var html = '<option value="">--请选择--</option>';
+					if(re.code == 1){				
+						var data = re.data;
+						for(var i in data){
+							html += '<option value="' +data[i].name+ '" data="' +data[i].id+ '">' +data[i].name+ '</option>';
+						}
+					}
+					$('#area_3').html(html);
+					
+					$('#area_3').on('change', function(){
+						$("[name='area_id']").val($(this).find(':selected').attr('data'));
+					});
+					
+					if(area_3 != ''){
+						$('#area_3').find('option[value="' +area_3+ '"]').prop('selected', true);
+						area_3 = '';
+					}
+				});
+			}
+		});
+		
+		$('#machine_type_1').on('change', function(){
+			var url = "{:url('user/adminIndex/getMachineType')}";
+			if($(this).find('option:selected').val() != ''){
+				$.post(url, {id:$(this).find('option:selected').attr('data-id')}, function(re){
+					var html = '<option value="">--请选择--</option>';
+					if(re.code == 1){				
+						var data = re.data;
+						for(var i in data){
+							html += '<option value="' +data[i].id+ '" data-id="' +data[i].id+ '">' +data[i].name + '[' + data[i].unit_name + ':' + data[i].unit + ']' + '</option>';
+						}
+					}
+					$('#machine_type_2').html(html);
+					
+					if(machine_type_2 != 0){
+						$('#machine_type_2').find('option[value="' +machine_type_2+ '"]').prop('selected', true);
+						machine_type_2 = 0;
+					}
+				});
+			}
+		});
+		
+		if(area_1 != ''){
+			$('#area_1').find('option[value="' +area_1+ '"]').prop('selected', true);
+			$('#area_1').trigger('change');
+			area_1 = '';
+		}
+
+		if(machine_type_1 != 0){
+			$('#machine_type_1').find('option[value="' +machine_type_1+ '"]').prop('selected', true);
+			$('#machine_type_1').trigger('change');
+			machine_type_1 = 0;
+		}
+	});
+	</script>
+</body>
+</html>

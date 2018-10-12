@@ -1,0 +1,80 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="javascript:;">出库结算</a></li>
+    </ul>
+
+    <form class="js-ajax-form" action="" method="post" id="J_form">
+        <table class="table table-list">
+            <thead>
+            <tr>
+				<th>资源种类</th>
+				<th>结算单价</th>
+				<th>重量（kg）/ 数量（个）</th>
+				<th>结算金额</th>
+				<th>合计</th>
+            </tr>
+            </thead>
+			<foreach name="data" item="v" key="k">
+			<tr class="success">
+				<td>{$v.name}</td>
+				<td>{$v.settlement_out_price}</td>
+				<td>{$v.stock}</td>
+				<td>{$v['settlement_out_price'] * $v['stock']}</td>
+				<eq name="k" value="0">
+				<td rowspan="{:count($data)}">{$total}</td>
+				</eq>
+			</tr>
+			</foreach>
+			<foreach name="data" item="v" key="k">
+			<tr class="active" id="J_id">
+				<td>{$v.name}</td>
+				<td>{$v.settlement_out_price}</td>
+				<td class="form-inline">
+					<div class="form-group">
+						<input type="text" class="form-control J_num" value="{$v.stock}" name="id[{$v.id}]"/>
+					</div>
+				</td>
+				<td>{$v['settlement_out_price'] * $v['stock']}</td>
+				<eq name="k" value="0">
+				<td rowspan="{:count($data)}">{$total}</td>
+				</eq>
+			</tr>
+			</foreach>
+        </table>
+		<br/>
+		<button type="submit" class="btn btn-primary js-ajax-submit" data-action="{:url('OutOrder/add')}">提交</button> </div>
+    </form>
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+<script>
+    function reloadPage(win) {
+        win.location.href = win.location.href;
+    }
+	
+	
+	$(function(){
+
+		$('.J_num').on('blur', function(){
+			var num = parseFloat($(this).val()).toFixed(2);
+			if(isNaN(num)){
+				num = 0;
+			}
+			$(this).val(num);
+			
+			var total = 0;
+			
+			$('tr.active').find('input').each(function(){
+				$this = $(this);
+				$(this).closest('td').next('td').html(parseFloat($(this).val() * parseFloat($(this).closest('td').prev('td').html())).toFixed(2));
+				total += $(this).val() * parseFloat($(this).closest('td').prev('td').html());
+			});
+			
+			$('tr.active:first').find('td:last').html(parseFloat(total).toFixed(2));
+		});
+	});
+</script>
+</body>
+</html>

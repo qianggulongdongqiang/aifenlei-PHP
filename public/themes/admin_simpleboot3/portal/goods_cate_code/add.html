@@ -1,0 +1,33 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li><a href="{:url('GoodsCateCode/index',['cid'=>$cid])}">列表</a></li>
+        <li class="active"><a href="{:url('GoodsCateCode/add',['cid'=>$cid])}">添加</a></li>
+    </ul>
+    <div class="row margin-top-20">
+        <div class="col-md-8">
+            <form class="js-ajax-form" action="{:url('GoodsCateCode/addPost')}" method="post">
+				<input type="hidden" name="cid" value="{$cid}" />
+                <div class="tab-content">
+                    <div class="tab-pane active">
+                        <div class="form-group">
+                            <label for="input-code"><span class="form-required">*</span>Code</label>
+                            <div>
+                                <input type="text" class="form-control" id="input-code" name="code">
+                            </div>
+                        </div>   						
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary js-ajax-submit">{:lang('ADD')}</button>
+                    <a class="btn btn-default" href="{:url('GoodsCateCode/index')}">{:lang('BACK')}</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="__STATIC__/js/admin.js"></script>
+</body>
+</html>
