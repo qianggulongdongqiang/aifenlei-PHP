@@ -3,7 +3,7 @@
 <body>
 <div class="wrap js-check-wrap">
     <ul class="nav nav-tabs">
-        <li><a href="{:url('Orders/index')}">订单列表</a></li>
+        <li><a href="<eq name="order_from" value="4">{:url('Orders/machine')}<else />{:url('Orders/index')}</eq>">订单列表</a></li>
 		<li class="active"><a href="javascript:;">订单详情</a></li>
     </ul>
 	<br />

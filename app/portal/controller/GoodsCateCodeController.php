@@ -12,7 +12,24 @@ class GoodsCateCodeController extends AdminBaseController{
 		$param = $this->request->param();
 		$condition = [];
 		$cid = isset($param['id']) ? intval($param['id']) : 0 ;
-		$condition['cid'] = $cid;
+		
+		$code = isset($param['code']) ? trim($param['code']) : '' ;
+		if($code){
+			$condition['code'] = ['like', '%' . $code . '%'];
+		}
+		$this->assign('code', $code);
+		
+		$name = isset($param['name']) ? trim($param['name']) : '' ;
+		if($name){
+			$condition['name'] = ['like', '%' . $name . '%'];
+		}
+		$this->assign('name', $name);
+		
+		$cate_id = isset($param['cate_id']) ? intval($param['cate_id']) : -1 ;
+		if($cate_id >= 0){
+			$condition['cid'] = $cate_id;
+		}
+		$this->assign('cate_id', $cate_id);
 
 
 		$Model = new GoodsCateCodeModel();
@@ -26,7 +43,11 @@ class GoodsCateCodeController extends AdminBaseController{
         $this->assign('data', $data);
 		$this->assign('cid', $cid);
         $this->assign('page', $data->render());
-
+		
+		$where['parent_id'] = 25;
+		$where['is_machine'] = 1;
+		$cate = Db::name('goods_cate')->where($where)->select()->ToArray();
+		$this->assign('cate', $cate);
 
         return $this->fetch();
     }
@@ -34,9 +55,13 @@ class GoodsCateCodeController extends AdminBaseController{
     public function add(){
 		$param = $this->request->param();
 		$cid = isset($param['cid']) ? intval($param['cid']) : 0 ;
-		if(!$cid){
-			$this->error('操作错误!');
-		}
+		
+		$where['parent_id'] = 25;
+		$where['is_machine'] = 1;
+		$cate = Db::name('goods_cate')->where($where)->select()->ToArray();
+		
+		$this->assign('cate', $cate);
+		
 		$this->assign('cid', $cid);
         return $this->fetch();
     }
@@ -52,15 +77,56 @@ class GoodsCateCodeController extends AdminBaseController{
 			
 			//排重
 			if(Db::name('GoodsCateCode')->where(['code'=>$data['code']])->count() > 0){
-				$this->error('Code已经存在!');	
+				$this->error('条码已经存在!');	
 			}
 
 			$result = Db::name('GoodsCateCode')->insert($data);
 			
 			if($result)	{
-				$this->success('添加成功!', url('GoodsCateCode/index',['id'=>$data['cid']]));
+				$this->success('添加成功!', url('GoodsCateCode/index'));
 			}else{
 				$this->error('添加失败!');	
+			}
+        }
+
+    }
+	
+	public function edit(){
+		$id = $this->request->param('id', 0, 'intval');
+        if ($id > 0) {
+            $where['parent_id'] = 25;
+			$cate = Db::name('goods_cate')->where($where)->select()->ToArray();
+			$this->assign('cate', $cate);
+			
+			$info = Db::name('goodsCateCode')->where(['id'=>$id])->find();
+			$this->assign('info', $info);
+			
+            return $this->fetch();
+        } else {
+            $this->error('操作错误!');
+        }
+    }
+
+    public function editPost(){
+        if ($this->request->isPost()) {
+            $data   = $this->request->param();
+
+            $result = $this->validate($data, 'GoodsCateCode');
+            if ($result !== true) {
+                $this->error($result);
+            }
+			
+			//排重
+			if(Db::name('GoodsCateCode')->where(['code'=>$data['code'], 'id'=>['neq', $data['id']]])->count() > 0){
+				$this->error('条码已经存在!');	
+			}
+
+			$result = Db::name('GoodsCateCode')->update($data);
+			
+			if($result)	{
+				$this->success('更新成功!', url('GoodsCateCode/index'));
+			}else{
+				$this->error('更新失败!');	
 			}
         }
 
@@ -72,9 +138,9 @@ class GoodsCateCodeController extends AdminBaseController{
 	public function import(){
 		$param = $this->request->param();
 		$cid = isset($param['cid']) ? intval($param['cid']) : 0 ;
-		if(!$cid){
+		/* if(!$cid){
 			$this->error('操作错误!');
-		}
+		} */
 		$this->assign('cid', $cid);
 	
 		if ($this->request->isPost()) {
@@ -105,8 +171,10 @@ class GoodsCateCodeController extends AdminBaseController{
 				}
 				
 				$data[] = [
-							'cid'=>$cid,
-							'code'=>$v[0]
+							'cid'=>$v[1],
+							'code'=>$v[0],
+							'name'=>$v[2],
+							'size'=>$v[3],
 						];
 			}
 			

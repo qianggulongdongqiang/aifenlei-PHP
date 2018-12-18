@@ -7,13 +7,13 @@ return [
     // 数据库类型
     'type'     => 'mysql',
     // 服务器地址
-    'hostname' => 'localhost',
+    'hostname' => '115.29.161.170',
     // 数据库名
-    'database' => 'aifenlei',
+    'database' => 'arcfun',
     // 用户名
-    'username' => 'aifenlei',
+    'username' => 'testing',
     // 密码
-    'password' => 'aifenlei',
+    'password' => '1376181069@HI',
     // 端口
     'hostport' => '3306',
     // 数据库编码默认采用utf8

@@ -36,7 +36,7 @@ class UserScoreController extends AdminBaseController{
 		
 		$scoreModel = new UserScoreLogModel();
 		
-		$ctype = ['order'=>'生成订单', 'consume'=>'积分消费', 'change'=>'积分调整', 'score'=>'积分兑换'];
+		$ctype = ['order'=>'生成订单', 'consume'=>'积分消费', 'change'=>'积分调整', 'score'=>'积分兑换', 'cash'=>'提现', 'invite'=>'邀请'];
 		
 		$data = $scoreModel
 				->where($condition)

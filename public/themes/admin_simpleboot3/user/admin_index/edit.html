@@ -3,7 +3,7 @@
 <body>
 	<div class="wrap">
 		<ul class="nav nav-tabs">
-			<li class="active"><a href="{:url('adminIndex/edit')}">{:lang('ADMIN_USER_USERINFO')}</a></li>
+			<li class="active"><a href="{:url('adminIndex/edit')}">编辑</a></li>
 		</ul>
 		<form class="form-horizontal js-ajax-form margin-top-20" role="form" method="post" action="{:url('adminIndex/edit')}">
         	<input type="hidden" name="id" value="{$id}" />
@@ -33,6 +33,15 @@
 				<label for="input-birthday" class="col-sm-2 control-label">生日</label>
 				<div class="col-md-6 col-sm-10">
 					<input type="text" class="form-control js-bootstrap-date" id="input-birthday" name="birthday" value="{:date('Y-m-d',$birthday)}" placeholder="2013-01-04">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="input-member_type" class="col-sm-2 control-label">居民身份</label>
+				<div class="col-md-6 col-sm-10">
+					<select class="form-control" name="member_type" id="input-member_type">
+						<option value="1" <eq name="member_type" value="1">selected="selected"</eq>>普通居民</option>
+						<option value="2" <eq name="member_type" value="2">selected="selected"</eq>>回收员居民</option>
+					</select>
 				</div>
 			</div>
 			</eq>
@@ -88,6 +97,15 @@
 				<label for="input-signature" class="col-sm-2 control-label">硬件编号</label>
 				<div class="col-md-6 col-sm-10">
 					<input type="text" class="form-control" id="input-signature" name="signature" value="{$signature}"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="input-machine" class="col-sm-2 control-label">类型</label>
+				<div class="col-md-6 col-sm-10">
+					<select class="form-control" id="machine" name="machine">
+						<option value="1" <eq name="machine" value="1">selected="selected"</eq>>回收机</option>
+						<option value="2" <eq name="machine" value="1">selected="selected"</eq>>交易柜</option>
+					</select>
 				</div>
 			</div>
 			<div class="form-group">

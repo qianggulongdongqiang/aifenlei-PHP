@@ -42,9 +42,10 @@ class UserController extends RestBaseController{
 			$log                = $userModel->doApi($user);
 			
 			$area = Db::name('area')->where(['master'=>$log['id']])->count();
-			$log['isMaster'] = $area > 0 ? true : false;
+			
 			
 			if($log){
+				$log['isMaster'] = $area > 0 ? true : false;
 				$this->success(['code' => 1, 'msg' => '登录成功!'] ,$log);
 			}else{
 				$this->error(['code' => 0, 'msg' => '登录失败!']);
@@ -150,6 +151,7 @@ class UserController extends RestBaseController{
 			$d['sex'] = isset($data['sex']) ? intval($data['sex']) : '';
 			$d['mobile'] = isset($data['mobile']) ? trim($data['mobile']) : '';
 			$d['user_addr'] = isset($data['addr']) ? trim($data['addr']) : '';
+			$d['member_type'] = isset($data['member_type']) ? intval($data['member_type']) : 1;
 			
 			//查询rfid是否可用
 			if($rfids){
@@ -163,7 +165,7 @@ class UserController extends RestBaseController{
 				}
 			}
 			
-			$validate = new Validate([
+			/* $validate = new Validate([
                 'mobile' 	=> 'require|mobile',
 				'user_nickname'  => 'require',
 				'sex'  	=> 'require',
@@ -179,11 +181,11 @@ class UserController extends RestBaseController{
 			
 			if (!$validate->check($d)) {
 				$this->error(['code' => 0, 'msg' => $validate->getError()]);
-            }
+            } */
 			
 			//新增住户
 			$userModel = new UserModel();
-			if(!$userModel->checkMobile([], $d['mobile'])){
+			if(isset($d['mobile']) && !$userModel->checkMobile([], $d['mobile'])){
 				$this->error(['code' => 0, 'msg' => '手机号已经存在！']);
 			}
 			
@@ -480,6 +482,204 @@ class UserController extends RestBaseController{
 			
 			$this->success('', $return);
 
+		}
+	}
+	
+	/**
+	 *	老用户发卡
+	 */
+	public function rfidBind(){
+		
+		if ($this->request->isPost()) {
+			//处理参数
+			$data = $this->request->put();
+			
+			$user = $this->user;
+			
+			if(!$user){
+				$this->error(['code' => 2, 'msg' => '请先登录!']);	
+			}
+			
+			$validate = new Validate([
+                'mobile' => 'require|mobile',
+                'rfids' => 'require',
+            ]);
+            $validate->message([
+                'mobile.require' => '手机号不能为空',
+                'mobile.mobile'     => '手机号码格式不正确',
+				'rfids.require'  => 'rfid不能为空',
+            ]);			
+            if (!$validate->check($data)) {
+				$this->error(['code' => 0, 'msg' => $validate->getError()]);
+            }
+
+			
+			$rfids = isset($data['rfids']) ? trim($data['rfids'], ',') : '';
+			$mobile = isset($data['mobile']) ? trim($data['mobile']) : '';
+
+			
+			//查询rfid是否可用
+			if($rfids){
+				foreach(explode(',' , $rfids) as $v){
+					$re = Db::name('rfid')->where(['code'=> $v])->find();
+					if(!$re){
+						$this->error(['code' => 0, 'msg' => $v . '不存在!']);
+					}elseif($re['user_id'] != 0){
+						$this->error(['code' => 0, 'msg' => $v . '已经被使用!']);
+					}
+				}
+			}
+			
+			//查询用户信息
+			$userModel = new UserModel();
+			$customer = $userModel->get_user_info(['mobile'=>$mobile]);
+			
+			if(!$customer){
+				$this->error(['code' => 0, 'msg' => '用户不存在！']);
+			}
+			
+			//查询绑定信息
+			if(Db::name('rfid')->where(['user_id'=>$customer['id']])->count() > 0){
+				$this->error(['code' => 0, 'msg' => '用户已经绑定过rfid！']);
+			}
+			
+			//绑定rfid
+			if($rfids){
+				Db::name('rfid')->where(['user_id'=>0, 'code'=>['in', $rfids]])->update(['user_id'=>$customer['id'], 'bind_time'=>time()]);
+			}
+			
+			$this->success(['code' => 1, 'msg' => '绑定成功!']);
+
+		}
+	}
+	
+	/**
+	 *	通过Rfid查询积分
+	 */
+	public function getScoreByRfid(){
+		
+		if ($this->request->isPost()) {
+			//处理参数
+			$data = $this->request->put();
+			
+			$user = $this->user;
+			
+			if(!$user){
+				$this->error(['code' => 2, 'msg' => '请先登录!']);	
+			}
+			
+			$d['rfid'] = isset($data['rfid']) ? trim($data['rfid']) : '';
+			
+			$userModel = new UserModel();
+			
+			$validate = new Validate([
+                'rfid' 	=> 'require',
+            ]);
+            $validate->message([
+                'rfid.require' => 'rfid不能为空',
+            ]);
+			if (!$validate->check($d)) {
+				$this->error(['code' => 0, 'msg' => $validate->getError()]);
+            }
+			
+
+			$re = Db::name('rfid')->where(['code'=> $d['rfid'], 'user_id'=>['neq', 0]])->find();
+			if(!$re){
+				$this->error('住户不存在！');
+			}
+			
+			unset($d['rfid']);
+			$d['user_type'] = 2;
+			$d['id'] = $re['user_id'];
+			
+			$custom = $userModel->getInfo($d);
+			
+			if(!$custom){
+				$this->error(['code' => 0, 'msg' => '住户不存在!']);
+			}
+			
+			$data = [
+						'id' => $custom['id'],
+						'name' => $custom['user_nickname'],
+						'mobile'=> $custom['mobile'],
+						'score' => $custom['score']
+					];
+			
+			$this->success(['code' => 1, 'msg' => '成功'], $data);	
+
+
+		}
+	}
+	
+	/**
+	 *	通过rfid扣除用户积分
+	 */
+	public function useScoreByRfid(){
+		
+		if ($this->request->isPost()) {
+			
+			$userModel = new UserModel();
+			
+			//处理参数
+			$data = $this->request->put();
+			
+			$user = $this->user;
+			
+			if(!$user){
+				$this->error(['code' => 2, 'msg' => '请先登录!']);	
+			}
+			$validate = new Validate([
+                'rfid' 	=> 'require',
+            ]);
+            $validate->message([
+                'rfid.require' => 'rfid不能为空',
+            ]);
+			if (!$validate->check($data)) {
+				$this->error(['code' => 0, 'msg' => $validate->getError()]);
+            }
+			
+			//查询rfid
+			$re = Db::name('rfid')->where(['code'=> $data['rfid'], 'user_id'=>['neq', 0]])->find();
+			if(!$re){
+				$this->error('住户不存在！');
+			}
+			
+			//查询住户
+			$d['user_type'] = 2;
+			$d['id'] = $re['user_id'];
+			$custom = $userModel->getInfo($d);
+			if(!$custom){
+				$this->error(['code' => 0, 'msg' => '住户不存在!']);
+			}
+			
+			//处理积分
+			$score = isset($data['score']) ? intval($data['score']) : 0;
+			if($score <= 0){
+				$this->error('扣除积分必须大于0！');
+			}
+			if($score > $custom['score']){
+				$this->error('积分不足!可用积分：' . $custom['score']);
+			}
+			
+			$remark = isset($data['remark']) ? $data['remark'] : '';
+			
+			$ins = [
+						'user_id' => $custom['id'],
+						'create_time' => time(),
+						'action'=> 'change: 回收员[' . $user['user_nickname'] . ']操作。' . $remark,
+						'score' => $score
+					];
+			
+			Db::startTrans();
+            try{
+                Db::name('user_score_log')->insert($ins);
+				Db::name('user')->where(['id'=>$custom['id']])->setDec('score', $score);
+                Db::commit();
+                $this->success(['code' => 1, 'msg' => '成功'], ['score'=>($custom['score'] - $score)]);
+            }catch (Exception $e){
+                Db::rollback();
+				$this->error('操作失败');
+            }
 		}
 	}
 }

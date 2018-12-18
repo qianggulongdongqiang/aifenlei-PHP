@@ -32,6 +32,13 @@ class OrdersController extends AdminBaseController{
         if (!empty($sn)) {
             $where['order_sn'] = ['like', "%$sn%"];
         }
+		$this->assign('sn', $sn);
+		
+		$mobile = empty($param['mobile']) ? '' : $param['mobile'];
+        if (!empty($mobile)) {
+            $where['buyer_phone'] = ['like', "%$mobile%"];
+        }
+		$this->assign('mobile', $mobile);
 		
 		$startTime = empty($param['start_time']) ? 0 : strtotime($param['start_time']);
         $endTime   = empty($param['end_time']) ? 0 : strtotime($param['end_time']);
@@ -358,7 +365,6 @@ class OrdersController extends AdminBaseController{
 		$where['order_from'] = 4;
 		
         $data = Db::name('order')->where($where)->order('add_time desc')->paginate(10, false,['query'=>request()->param()]);
-		
 
         $this->assign('data', $data);
         $this->assign('page', $data->render());
@@ -367,6 +373,12 @@ class OrdersController extends AdminBaseController{
 		$machine_type = Db::name('goods_cate')->where(['parent_id'=>0, 'is_machine'=>1])->select();
 		$this->assign('area', $area);
 		$this->assign('machine_type', $machine_type);
+		
+		$machine = [];
+		foreach(Db::name('user')->where(['user_type'=>4])->select() as $v){
+			$machine[$v['id']] = $v['user_addr'];
+		}
+		$this->assign('machine', $machine);
 		
         return $this->fetch();
     }

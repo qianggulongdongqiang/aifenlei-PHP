@@ -1,0 +1,33 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap">
+    <ul class="nav nav-tabs">
+        <li><a href="{:url('adminIndex/index', ['type'=>4])}">回收机</a></li>
+		<li class="active"><a href="{:url('adminIndex/import')}">数据导入</a></li>
+    </ul>
+
+	<form class="form-horizontal js-ajax-form margin-top-20" action="{:url('adminIndex/import')}" method="post">
+		<div class="form-group">
+			<label class="col-sm-2 control-label" for="file">文件</label>
+			<div class="col-md-6 col-sm-10">
+				<div>
+					<input class="form-control" id="file" name="file" value="" style="width: 300px;display: inline-block;" title="文件名称" type="text">
+					<a href="javascript:uploadOne('文件上传','#file','file');">上传文件</a>
+				</div>
+				<p class="help-block">上传文件<a href='__STATIC__/docs/machine.xlsx'>模板下载</a></p>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+
+				<button type="submit" class="btn btn-primary js-ajax-submit">上传</button>
+				<a class="btn btn-default" href="{:url('adminIndex/index', ['type'=>4])}">{:lang('BACK')}</a>
+			</div>
+		</div>
+	</form>
+
+</div>
+<script type="text/javascript" src="__STATIC__/js/admin.js"></script>
+</body>
+</html>

@@ -125,9 +125,9 @@ final class Http {
             $result['headers'] = $response['headers'];
             return $result;
         } elseif (is_null($data)) {
-            throw new ServiceNotAvaliable($response);
+            new ServiceNotAvaliable($response);
         } else {
-            throw new APIRequestException($response);
+            new APIRequestException($response);
         }
     }
 

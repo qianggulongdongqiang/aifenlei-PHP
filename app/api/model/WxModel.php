@@ -13,7 +13,11 @@ class WxModel extends Model{
 		$wxSettings    = cmf_get_option('wx_settings');
 		$this->APPID = $wxSettings['wx_appid'];
 		$this->SECRET = $wxSettings['wx_appsecret'];
-		//$this->MCHID = $wxSettings['wx_mchid'];
+		$this->MCHID = $wxSettings['wx_mchid'];
+		$this->APIKEY = $wxSettings['wx_apikey'];
+		
+		$this->SSLCERT_PATH = CMF_ROOT . 'data/' . 'apiclient_cert.pem';
+		$this->SSLKEY_PATH = CMF_ROOT . 'data/' .  'apiclient_key.pem';
 		
 	}
 	
@@ -101,6 +105,29 @@ class WxModel extends Model{
 		$url = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=' . $token;
 
 		return $this->httpPost($url, $content); 
+	}
+	
+	/**
+	 *	判断用户是否关注公众号
+	 */
+	public function isSubscribe($openid){
+		$token = $this->getAccessToken();
+		$url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=".$token."&openid=".$openid."&lang=zh_CN";
+
+		$re = json_decode($this->getUrlContents($url), true);
+		
+		$subscribe = isset($re['subscribe']) ? $re['subscribe'] : 0;
+		
+		return $subscribe;
+	}
+	
+	/**
+	 *	通过openid获取用户信息
+	 */
+	public function getUserInfoByOpenid($openid){
+		$token = $this->getAccessToken();
+		$url = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token=' . $token . '&openid=' . $openid . '&lang=zh_CN';
+		return $this->getUrlContents($url); 
 	}
   
 	public function returnToken(){
@@ -230,4 +257,74 @@ class WxModel extends Model{
 
 		return $res;
 	}
+	
+	public function sign(array $data){
+        ksort($data);
+
+        $a = array();
+        foreach ($data as $k => $v) {
+            if ((string) $v === '') {
+                continue;
+            }
+            $a[] = "{$k}={$v}";
+        }
+
+        $a = implode('&', $a);
+        $a .= '&key=' . $this->APIKEY;
+
+        return strtoupper(md5($a));
+    }
+	
+	public function postXml($url, array $data, $cert = false){
+        // pack xml
+        $xml = $this->arrayToXml($data);
+
+        // curl post
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_URL, $url);
+		
+		if($cert == true){
+			//设置证书
+			//使用证书：cert 与 key 分别属于两个.pem文件
+			curl_setopt($ch,CURLOPT_SSLCERTTYPE,'PEM');
+			curl_setopt($ch,CURLOPT_SSLCERT, $this->SSLCERT_PATH);
+			curl_setopt($ch,CURLOPT_SSLKEYTYPE,'PEM');
+			curl_setopt($ch,CURLOPT_SSLKEY, $this->SSLKEY_PATH);
+		}else{
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+		}
+        
+        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
+        $response = curl_exec($ch);
+        if (!$response) {
+            echo 'CURL Error: ' . curl_errno($ch);
+			return false;
+        }
+        curl_close($ch);
+
+        // unpack xml
+        return $this->xmlToArray($response);
+    }
+
+    public function arrayToXml(array $data){
+        $xml = "<xml>";
+        foreach ($data as $k => $v) {
+            if (is_numeric($v)) {
+                $xml .= "<{$k}>{$v}</{$k}>";
+            } else {
+                $xml .= "<{$k}><![CDATA[{$v}]]></{$k}>";
+            }
+        }
+        $xml .= "</xml>";
+        return $xml;
+    }
+
+    public function xmlToArray($xml){
+        return json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+    }
 }

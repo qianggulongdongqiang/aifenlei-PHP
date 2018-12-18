@@ -2,6 +2,7 @@
 namespace app\api\model;
 
 use think\Model;
+use app\api\model\WxModel;
 
 class UserModel extends Model{
 	
@@ -73,6 +74,10 @@ class UserModel extends Model{
 	 *	通过openid注册用户
 	 */
 	public function addCustomerByOpenID($openid){
+		$wxModel 	= new WxModel();
+		$info		= $wxModel->getUserInfoByOpenid($openid);
+		$info		= json_decode($info, true);
+		
 		$data   = [
                 'last_login_ip'   	=> get_client_ip(0, true),
                 'create_time'     	=> time(),
@@ -80,6 +85,8 @@ class UserModel extends Model{
                 'user_status'     	=> 1,
                 'user_type'       	=> 2,
 				'openid'			=> $openid,
+				'avatar'			=> (isset($info['headimgurl']) ? $info['headimgurl'] : ''),
+				'user_nickname'		=> (isset($info['nickname']) ? $info['nickname'] : ''),
             ];
 		$userId = $this->insertGetId($data);
 		$data   = $this->where('id', $userId)->find();

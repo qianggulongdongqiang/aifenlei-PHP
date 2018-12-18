@@ -61,6 +61,11 @@ class CustomerController extends RestBaseController{
 		}
 	}
 	
+	public function isSub(){
+		$wxModel = new WxModel();
+		dump($wxModel->isSubscribe('o3yOR5xAAo64ccJMHYrHLXXuylMw'));
+	}
+	
 	/**
 	 *	获取用户信息
 	 */
@@ -68,6 +73,7 @@ class CustomerController extends RestBaseController{
 		if ($this->request->isPost()) {
 		
 			$user = $this->user;
+			$wxModel = new WxModel();
 			
 			if($user){
 			
@@ -75,6 +81,12 @@ class CustomerController extends RestBaseController{
 				
 				if(!isset($more['area_id'])){
 					$more = [];
+				}
+				
+				if($user['openid']){
+					$subscribe = $wxModel->isSubscribe($user['openid']);
+				}else{
+					$subscribe = 0;
 				}
 			
 				$return = [
@@ -84,6 +96,8 @@ class CustomerController extends RestBaseController{
 								'score' => $user['score'],
 								'mobile' => $user['mobile'],
 								'more' => $more,
+								'member_type'=>$user['member_type'],
+								'subscribe'=>$subscribe
 							];
 	
 				$this->success('' ,$return);
@@ -473,6 +487,7 @@ class CustomerController extends RestBaseController{
 			
 			$user = $this->user;
 			$userModel = new UserModel();
+			$wxModel = new WxModel();
 			
 			if(!$user){
 				$this->error(['code' => 2, 'msg' => '请先登录!']);	
@@ -505,12 +520,13 @@ class CustomerController extends RestBaseController{
 
 			if($log){
 				//验证手机是否已经绑定
-				$_user = Db::name('user')->where(['mobile'=>$data['phone'], 'id' => array('neq', $user['id'])])->find();
+				$_user = Db::name('user')->where(['mobile'=>$data['phone'], 'id' => array('neq', $user['id']), 'user_type'=>2])->find();
 				if(!$_user){
 					$userModel->where(['id'=>$user['id']])->setField('mobile', $data['phone']);
 				}elseif($_user && $_user['openid'] == '' && $user['openid'] != ''){
 					$userModel->where(['id'=>$_user['id']])->setField('openid', $user['openid']);
 					$userModel->where(['id'=>$user['id']])->setField('openid', '');
+					Db::name('user_token')->where(['user_id'=>$user['id']])->delete();
 					$token = cmf_generate_user_token($_user['id'], 'mobile');
 				}else{
 					$this->error(['code' => 0, 'msg' => '手机号已经存在']);
@@ -521,20 +537,35 @@ class CustomerController extends RestBaseController{
 				//是否需要推送
 				if(isset($data['mid'])){
 					$content = "恭喜登陆成功！请在自助机确认身份并开始投递！";	
+					
+					$id = substr($data['mid'], 0 , strlen($data['mid']) - 1);
+					$type = substr($data['mid'], -1 , 1);
 			
-					$machine = $userModel->get_machine_info(['id'=>intval($data['mid'])], 'id,code');
-					$user = $userModel->get_user_info(['id'=>$user['id']], 'id,user_nickname,sex,birthday,score,mobile,more');
+					$machine = $userModel->get_machine_info(['id'=>$id], 'id,code');
+					$user = $userModel->get_user_info(['id'=>$user['id']], 'id,user_nickname,sex,birthday,score,mobile,more,openid,avatar');
 					
 					if($machine['code'] != ''){
 						$userMsgModel = new UserMsgModel();
-						
+						$user = $user->toArray();
+						if($user['openid']){
+							$user['subscribe'] = $wxModel->isSubscribe($user['openid']);
+						}else{
+							$user['subscribe'] = 0;
+						}
+						unset($user['openid']);
 						$info = [
 									'content'=>'扫码开门',
-									'user'=>$user->toArray(),
+									'user'=>$user,
 									'type'=>'10'
 								];
+								
+						if($type == 0){
+							$_type = 'm';
+						}else{
+							$_type = 'j';
+						}
 						
-						$res = $userMsgModel->push($machine['code'], '', $info, 'm');
+						$res = $userMsgModel->push($machine['code'], '', $info, $_type);
 					}
 				}
 

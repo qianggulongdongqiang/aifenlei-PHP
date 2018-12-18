@@ -5,6 +5,7 @@
     <ul class="nav nav-tabs">
         <li class="active"><a>{$title}</a></li>
         <li><a href="{:url('adminIndex/add', ['type'=>$type])}">新增{$title}</a></li>
+		<eq name="type" value="4"><li><a href="{:url('adminIndex/import')}">数据导入</a></li></eq>
     </ul>
     <form class="well form-inline margin-top-20" method="post" action="{:url('user/adminIndex/index', ['type'=>$type])}">
         <input class="form-control" type="text" name="keyword" style="width: 200px;" value="{:input('request.keyword')}"
@@ -62,6 +63,7 @@
                 <th><if condition="$type eq 4" />登录帐号<else/>账户编号</if></th>
                 <if condition="$type eq 2" />
                 <th>姓名</th>
+				<th>居民身份</th>
                 <th>性别</th>
                 <th>联系方式</th>
                 <th>住址</th>
@@ -76,6 +78,7 @@
                 <th>社区</th>
 				<elseif condition="$type eq 4" />
 				<th>位置</th>
+				<th>类型</th>
             	</if>
                 <th>{:lang('STATUS')}</th>
                 <th>{:lang('ACTIONS')}</th>
@@ -86,11 +89,13 @@
 				
 			if($type == 4){
 				$user_statuses=array("0"=>'未同步',"1"=>'未同步',"2"=>'未同步', "10"=>"正常", "20"=>"离线","30"=>"故障","40"=>"满箱");
+				$machine_type = ['0'=>'无', '1'=>'回收机', '2'=>'交易柜'];
 			}else{
 				$user_statuses=array("0"=>lang('USER_STATUS_BLOCKED'),"1"=>lang('USER_STATUS_ACTIVATED'),"2"=>lang('USER_STATUS_UNVERIFIED'));
 			}	
                 $sexs=array("0"=>lang('GENDER_SECRECY'),"1"=>lang('MALE'),"2"=>lang('FEMALE'));
 				$class = ["0"=>'text-default',"1"=>'text-default',"2"=>'text-default', "10"=>"text-default", "20"=>"text-warning","30"=>"text-danger","40"=>"text-info"];
+				$member_type = ['1'=>'普通居民', '2'=>'回收员居民'];
             </php>
             <foreach name="list" item="vo">
             	
@@ -100,7 +105,8 @@
                     </td>
                     <if condition="$type eq 2" />
                     <td>{$vo['user_nickname']?$vo['user_nickname']:lang('NOT_FILLED')}</td>
-                    <td>{$sexs[$vo['sex']]}</td>
+					<td>{$member_type[$vo['member_type']]}</td>
+					<td>{$sexs[$vo['sex']]}</td>
                     <td>{$vo.mobile}</td>
                     <td>{$vo['user_addr']}</td>
                     <td>{$vo['score']}</td>
@@ -110,6 +116,7 @@
                     <td>{$vo['user_addr']}</td>
                     <elseif condition="$type eq 4" />
                     <td>{$vo['user_addr']}</td>
+					<td>{$machine_type[$vo['machine']]}</td>
                     </if>
                     <td class="{$class[$vo['user_status']]}">{$user_statuses[$vo['user_status']]}</td>
                     <td>
@@ -135,6 +142,7 @@
 						<a class="js-ajax-delete" href="{:url('adminIndex/delete_collecter',array('id'=>$vo['id']))}">{:lang('DELETE')}</a>
 						</eq>
 						<eq name="vo.user_type" value="4">
+						<a class="js-ajax-delete" href="{:url('adminIndex/delete_machine',array('id'=>$vo['id']))}">{:lang('DELETE')}</a>
 						<a href="{:url('adminIndex/machine_state_log',array('id'=>$vo['id']))}">状态日志</a>
 						</eq>
                     </td>

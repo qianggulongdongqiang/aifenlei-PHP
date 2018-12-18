@@ -75,6 +75,15 @@
 								</select>
                             </div>
                         </div>
+						<div class="form-group">
+                            <label for="input-member_type">居民身份</label>
+                            <div>
+                                <select id="input-member_type" name="member_type" class="form-control">
+									<option value="1" <if condition="$member_type eq 1">selected="selected"</if>>普通居民</option>
+									<option value="2" <if condition="$member_type eq 2">selected="selected"</if>>回收员居民</option>
+								</select>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="input-img_1">图片1</label>
                             <div>

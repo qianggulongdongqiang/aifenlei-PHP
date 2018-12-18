@@ -5,6 +5,7 @@ use cmf\controller\RestBaseController;
 use app\api\model\UserModel;
 use app\api\model\GoodsCateModel;
 use app\api\model\OrderModel;
+use app\api\model\WxModel;
 use think\Validate;
 use think\Db;
 
@@ -139,6 +140,41 @@ class OrderController extends RestBaseController{
 														'score'=>$points_number
 													]);
 					$order['user_score'] = Db::name('user')->where(['id'=>$custom['id']])->value('score');
+					
+					if($custom['openid']){
+						//推送公众号消息
+						$wxModel = new WxModel();
+						$msg_goods = '';
+						foreach($_goods_data as $v){
+							$msg_goods .= $v['name'] . ' ';
+						}
+						
+						$msg = '{
+							   "touser":"' .$custom['openid']. '",
+							   "template_id":"0ERWsoaEF9V2gs2Lkgx0tHmPo2eX3myR07IKvTAhZ-w", 
+							   "url":"' . cmf_get_domain() . '/#/points",					   
+							   "data":{
+									   "first": {
+										   "value":""
+									   },
+									   "keyword1":{
+										   "value":"' . date('Y年m月d日 H:i:s') . '"
+									   },
+									   "keyword2": {
+										   "value":"' . $points_number . '"
+									   },
+									   "keyword3": {
+										   "value":"' . $msg_goods . '"
+									   }, 
+									   "remark":{
+										   "value":"点击详情进入积分提现服务",
+										   "color":"#999"
+									   }
+							   }
+						   }';
+						   
+						   $re = $wxModel->sendMsg($msg);
+					}
 				}
 				
 				if($sn){

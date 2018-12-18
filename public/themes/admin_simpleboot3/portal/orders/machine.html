@@ -45,6 +45,7 @@
 				<th>资源种类</th>
 				<th>重量（kg）/ 数量（个）</th>
 				<th>兑换积分</th>
+				<th>区域位置</th>
                 <th width="90">操作</th>
             </tr>
             </thead>
@@ -64,6 +65,7 @@
 						</foreach>
                     </td>
 					<td>{$vo.points_number}</td>
+					<td><notempty name="machine[$vo['mid']]">{$machine[$vo['mid']]}</notempty></td>
                     <td>
                         <a href="{:url('Orders/detail',array('id'=>$vo['order_id']))}">详情</a>
                     </td>
@@ -76,6 +78,7 @@
 				<th>资源种类</th>
 				<th>重量（kg）/ 数量（个）</th>
 				<th>兑换积分</th>
+				<th>区域</th>
                 <th width="90">操作</th>
             </tr>
             </tfoot>

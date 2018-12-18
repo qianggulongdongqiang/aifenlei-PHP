@@ -48,9 +48,13 @@ class CommonController extends RestBaseController{
 	public function getSecGoods(){
 		if ($this->request->isPost()) {
 			
+			//处理参数
+			$data = $this->request->put();
+			
 			$goodsCate = new GoodsCateModel();
 			
 			$condition['is_machine'] = 0;
+			$condition['member_type'] = isset($data['member_type']) ? intval($data['member_type']) : 1;
 			
 			$res =  $goodsCate->getSecList($condition, 'id,name,unit_name,unit,purchasing_price,purchasing_point,img_1,img_2');
 			

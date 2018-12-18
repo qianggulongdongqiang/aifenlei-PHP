@@ -177,6 +177,7 @@ class AdminIndexController extends AdminBaseController{
         if ($id) {
             $result = Db::name("user")->where(["id" => $id, "user_type" => $this->type])->setField('user_status', 0);
             if ($result) {
+				Db::name('user_token')->where(['user_id'=>$id])->delete();
                 $this->success("拉黑成功！", "adminIndex/index");
             } else {
                 $this->error('拉黑失败,用户不存在！');
@@ -226,6 +227,12 @@ class AdminIndexController extends AdminBaseController{
 	public function add(){
         if ($this->request->isPost()) {
 			$data             = $this->request->post();
+			
+			//登录帐号排重
+			if(Db::name('user')->where(['user_login'=>$data['user_login']])->count() > 0){
+				$this->error('登录帐号重复！');
+			}
+			
 			unset($data['type']);
 			$data['user_type'] = $this->type;
 			$data['birthday'] = isset($data['birthday']) ? strtotime($data['birthday']) : 0;	
@@ -455,6 +462,16 @@ class AdminIndexController extends AdminBaseController{
         }
     }
 	
+	public function delete_machine(){
+        $id = $this->request->param('id', 0, 'intval');
+		
+        if (Db::name('user')->where(["id" => $id, 'user_type'=>4])->delete() !== false) {
+            $this->success("删除成功！");
+        } else {
+            $this->error("删除失败！");
+        }
+    }
+	
 	public function score(){
 		if ($this->request->isPost()) {
 			$data             = $this->request->post();
@@ -511,5 +528,73 @@ class AdminIndexController extends AdminBaseController{
 		
         // 渲染模板输出
         return $this->fetch('machine_state_log');
+    }
+	
+	/**
+     * 导入机器新增
+     */
+	public function import(){
+
+		if ($this->request->isPost()) {
+			$file = $this->request->param('file','', 'trim');	
+			//读取文件
+			$file_url = './upload/' . $file;
+			$extension = strtolower( pathinfo($file_url, PATHINFO_EXTENSION) );
+			if ($extension =='xlsx') {
+				$objReader = new \PHPExcel_Reader_Excel2007();
+				$objExcel = $objReader ->load($file_url);
+			} else if ($extension =='xls') {
+				$objReader = new \PHPExcel_Reader_Excel5();
+				$objExcel = $objReader->load($file_url);
+			}
+			$excel_array=$objExcel->getsheet(0)->toArray();   //转换为数组格式
+			array_shift($excel_array);  //删除第一个数组(标题);
+
+			//获取区域列表
+			$area = Db::name('area')->field('id, name')->select()->toArray();
+			foreach($area as $v){
+				$area_list[$v['name']] = $v['id'];
+			}
+
+			$log = '';
+			$data = [];
+			
+			//处理数据
+			foreach($excel_array as $k=>$v){
+				$_data = [];
+				$_data['user_login'] = trim($v[0]);
+				$_data['user_type'] = 4;
+				$_data['user_pass'] = cmf_password($v[1]);
+				$_data['machine'] = (trim($v[2]) == '回收机') ? 1 : 2;
+				$_data['more'] = json_encode([
+												'machine_type_1'=> intval($v[3]),
+												'machine_type_2'=> intval($v[4]),
+											]);
+				$_data['user_addr'] = trim($v[6]) . ' ' . trim($v[7]) . ' ' . trim($v[8]) . ' ' . trim($v[5]);
+				$_data['area_id'] = isset($area_list[trim($v[8])]) ? $area_list[trim($v[8])] : 0;
+				$_data['signature'] = trim($v[9]);
+				
+				if(Db::name('user')->where(['user_login'=>$_data['user_login'], 'user_type'=>$_data['user_type']])->count() > 0){
+					$log .= "第" .($k + 2). "行IMEI编码已经存在";
+					break;
+				}
+				
+			
+				$data[] = $_data;
+
+			}
+			
+			if(empty($log) && $data){
+				Db::name('user')->insertAll($data);
+			}
+			
+			if(!empty($log)){	
+				$this->error($log);
+			}else{
+				$this->success('导入成功!', url('adminIndex/index', ['type'=>4]));
+			}
+		}
+		
+		return $this->fetch();
     }
 }

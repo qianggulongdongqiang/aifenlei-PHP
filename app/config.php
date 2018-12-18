@@ -220,7 +220,8 @@ $configs = [
         'list_rows' => 15,
     ],
     'queue'                   => [
-        'connector' => '\cmf\queue\connector\Database'
+        //'connector' => '\cmf\queue\connector\Database'
+		'connector' => 'sync'
     ],
     // +----------------------------------------------------------------------
     // | CMF 设置

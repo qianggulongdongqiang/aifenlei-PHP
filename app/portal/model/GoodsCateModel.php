@@ -60,18 +60,31 @@ class GoodsCateModel extends Model{
         if (!is_array($currentIds)) {
             $currentIds = [$currentIds];
         }
+		
+		$member_type = ['1'=>'普通居民', '2'=>'回收员居民'];
 
         $newCategories = [];
         foreach ($categories as $item) {
             $item['checked'] = in_array($item['id'], $currentIds) ? "checked" : "";
             $item['url']     = cmf_url('portal/GoodsCate/index', ['id' => $item['id']]);
-            $item['str_action'] = '<a href="' . url("GoodsCate/add", ["parent" => $item['id']]) . '">添加子分类</a>  <a href="' . url("GoodsCate/edit", ["id" => $item['id']]) . '">' . lang('EDIT') . '</a>  <a class="js-ajax-delete" href="' . url("GoodsCate/delete", ["id" => $item['id']]) . '">' . lang('DELETE') . '</a>';
+			$item['str_action'] = '';
+			if($item['parent_id'] == 0){
+				$item['str_action'] = '<a href="' . url("GoodsCate/add", ["parent" => $item['id']]) . '">添加子分类</a> ';  
+			}
+			
+			$item['str_action'] .= '<a href="' . url("GoodsCate/edit", ["id" => $item['id']]) . '">' . lang('EDIT') . '</a>  ';
+			
+			if($item['is_machine'] != 1){
+				$item['str_action'] .= '<a class="js-ajax-delete" href="' . url("GoodsCate/delete", ["id" => $item['id']]) . '">' . lang('DELETE') . '</a>';
+			}
 			$item['img_1'] = empty($item['img_1']) ? '' : '<img src="'.cmf_get_image_preview_url($item['img_1']).'" height="50" />';
 			$item['img_2'] = empty($item['img_2']) ? '' : '<img src="'.cmf_get_image_preview_url($item['img_2']).'" height="50" />';
+			$item['member_type'] = $member_type[$item['member_type']];
 			if($item['is_machine'] == 1){
 				$item['name'] .= '(自助)';
-				if($item['parent_id'] != 0)
-				$item['str_action'] .= ' <a href="' . url("GoodsCateCode/index", ["id" => $item['id']]) . '">条码管理</a>';
+				if($item['parent_id'] == 25 || $item['id'] == 25){
+					$item['str_action'] .= ' <a href="' . url("GoodsCateCode/index", ["id" => $item['id']]) . '">条码管理</a>';
+				}
 			}
             array_push($newCategories, $item);
         }
@@ -86,6 +99,7 @@ class GoodsCateModel extends Model{
 						<td>\$unit_name ：\$unit</td>
 						<td>\$img_1</td>
 						<td>\$img_2</td>
+						<td>\$member_type</td>
                         <td>\$str_action</td>
                     </tr>";
         }

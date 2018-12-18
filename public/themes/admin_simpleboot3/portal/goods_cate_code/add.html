@@ -1,32 +1,50 @@
 <include file="public@header"/>
 </head>
 <body>
-<div class="wrap js-check-wrap">
+<div class="wrap">
     <ul class="nav nav-tabs">
-        <li><a href="{:url('GoodsCateCode/index',['cid'=>$cid])}">列表</a></li>
+        <li><a href="{:url('GoodsCateCode/index',['id'=>$cid])}">列表</a></li>
         <li class="active"><a href="{:url('GoodsCateCode/add',['cid'=>$cid])}">添加</a></li>
     </ul>
-    <div class="row margin-top-20">
-        <div class="col-md-8">
-            <form class="js-ajax-form" action="{:url('GoodsCateCode/addPost')}" method="post">
-				<input type="hidden" name="cid" value="{$cid}" />
-                <div class="tab-content">
-                    <div class="tab-pane active">
-                        <div class="form-group">
-                            <label for="input-code"><span class="form-required">*</span>Code</label>
-                            <div>
-                                <input type="text" class="form-control" id="input-code" name="code">
-                            </div>
-                        </div>   						
-                    </div>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary js-ajax-submit">{:lang('ADD')}</button>
-                    <a class="btn btn-default" href="{:url('GoodsCateCode/index')}">{:lang('BACK')}</a>
-                </div>
-            </form>
-        </div>
-    </div>
+
+	<form class="form-horizontal js-ajax-form margin-top-20" action="{:url('GoodsCateCode/addPost')}" method="post">
+		<div class="form-group">
+			<label for="input-code" class="col-sm-2 control-label"><span class="form-required">*</span>条码编号</label>
+			<div class="col-md-6 col-sm-10">
+				<input type="text" class="form-control" id="input-code" name="code">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="input-name" class="col-sm-2 control-label">类型</label>
+			<div class="col-md-6 col-sm-10">
+				<select class="form-control" id="cid" name="cid">
+					<option value="0">未知</option>
+					<foreach name="cate" item="a">
+					<option value="{$a.id}" <eq name="cid" value="$a['id']">selected="selected"</eq>>{$a.name}</option>
+					</foreach>
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="input-code" class="col-sm-2 control-label">名称</label>
+			<div class="col-md-6 col-sm-10">
+				<input type="text" class="form-control" id="input-name" name="name">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="input-code" class="col-sm-2 control-label">尺寸</label>
+			<div class="col-md-6 col-sm-10">
+				<input type="text" class="form-control" id="input-size" name="size">
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<button type="submit" class="btn btn-primary js-ajax-submit">{:lang('ADD')}</button>
+				<a class="btn btn-default" href="{:url('GoodsCateCode/index')}">{:lang('BACK')}</a>
+			</div>
+		</div>
+	</form>
+
 </div>
 <script type="text/javascript" src="__STATIC__/js/admin.js"></script>
 </body>
